@@ -39,6 +39,59 @@
     audio.__fade = requestAnimationFrame(step);
   }
 
+  /* ── Mesa de mezcla: Web Audio. iOS ignora volume, pero las rampas de
+     ganancia sí funcionan ahí. Se arma dentro del toque del sello. ── */
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  let mezcla = null;
+  const ganancia = { trailer: null, cancion: null };
+  const NIVEL = { trailer: 1, cancion: 0.85 };
+
+  function armarMezcla(trailerEl, cancionEl) {
+    if (mezcla || !AudioCtx) return;
+    try {
+      mezcla = new AudioCtx();
+      [['trailer', trailerEl], ['cancion', cancionEl]].forEach(([nombre, el]) => {
+        if (!el) return;
+        const fuente = mezcla.createMediaElementSource(el);
+        const g = mezcla.createGain();
+        g.gain.value = 0;
+        fuente.connect(g);
+        g.connect(mezcla.destination);
+        ganancia[nombre] = g;
+      });
+    } catch (error) {
+      mezcla = null;
+      ganancia.trailer = null;
+      ganancia.cancion = null;
+    }
+    if (mezcla && mezcla.state === 'suspended') mezcla.resume().catch(() => {});
+  }
+
+  // Rampa suave hacia un nivel; con Web Audio es exponencial (natural al
+  // oido), sin el se cae al fundido por volume (escritorio / Android).
+  function fundir(nombre, media, hasta, ms, done) {
+    const g = ganancia[nombre];
+    if (mezcla && g) {
+      const ahora = mezcla.currentTime;
+      const desde = Math.max(0.0001, g.gain.value);
+      const meta = Math.max(0.0001, hasta);
+      g.gain.cancelScheduledValues(ahora);
+      g.gain.setValueAtTime(desde, ahora);
+      g.gain.exponentialRampToValueAtTime(meta, ahora + ms / 1000);
+      if (hasta <= 0) g.gain.setValueAtTime(0, ahora + ms / 1000 + 0.01);
+      if (done) setTimeout(done, ms + 20);
+      return;
+    }
+    fadeAudio(media, hasta, ms, done);
+  }
+
+  function despertarMezcla() {
+    if (mezcla && mezcla.state === 'suspended') mezcla.resume().catch(() => {});
+  }
+  ['pointerdown', 'touchstart', 'keydown'].forEach((evento) => {
+    document.addEventListener(evento, despertarMezcla, { passive: true });
+  });
+
   /* ── 0. Personalización por enlace: ?invitado=Nombre&n=12 ── */
   const params = new URLSearchParams(window.location.search);
   const guestName = (params.get('invitado') || params.get('para') || '').trim().slice(0, 60);
@@ -103,8 +156,20 @@
   document.body.classList.add('is-locked');
 
   function aplicarSilencio() {
-    if (cancion) cancion.muted = mudo;
-    if (trailer) trailer.muted = docked ? true : (mudo || !soundUnlocked);
+    if (mezcla) {
+      if (mudo) {
+        fundir('cancion', cancion, 0, 450, () => { if (mudo && cancion) cancion.muted = true; });
+        fundir('trailer', trailer, 0, 450, () => { if (mudo && trailer) trailer.muted = true; });
+      } else {
+        if (cancion) cancion.muted = false;
+        if (trailer) trailer.muted = docked ? true : !soundUnlocked;
+        if (docked) fundir('cancion', cancion, NIVEL.cancion, 700);
+        else if (soundUnlocked) fundir('trailer', trailer, NIVEL.trailer, 700);
+      }
+    } else {
+      if (cancion) cancion.muted = mudo;
+      if (trailer) trailer.muted = docked ? true : (mudo || !soundUnlocked);
+    }
     if (silencio) {
       silencio.classList.toggle('is-mudo', mudo);
       silencio.setAttribute('aria-label', mudo ? 'Activar sonido' : 'Silenciar');
@@ -142,7 +207,11 @@
     try { trailer.volume = 1; } catch (error) { /* iOS */ }
     const attempt = trailer.play();
     if (attempt && typeof attempt.then === 'function') {
-      attempt.then(() => { soundUnlocked = true; reflejarSonido(); }).catch(() => {
+      attempt.then(() => {
+        soundUnlocked = true;
+        reflejarSonido();
+        fundir('trailer', trailer, mudo ? 0 : NIVEL.trailer, 1400);
+      }).catch(() => {
         // La imagen nunca se arriesga: en silencio y con el botón de sonido a la vista.
         trailer.muted = true;
         safePlay(trailer);
@@ -151,6 +220,7 @@
     } else {
       soundUnlocked = true;
       reflejarSonido();
+      fundir('trailer', trailer, mudo ? 0 : NIVEL.trailer, 1400);
     }
     vigilarArranque();
   }
@@ -179,6 +249,7 @@
     opened = true;
     document.body.classList.add('is-open');
     if (portada) portada.classList.add('is-opening');
+    armarMezcla(trailer, cancion);
     arrancarConSonido();
     if (ambiente && esEscritorio.matches) { ambiente.preload = 'auto'; safePlay(ambiente); }
     // iOS solo deja reproducir fuera de un toque a los elementos que ya
@@ -211,8 +282,14 @@
 
   if (soundButton && trailer) {
     soundButton.addEventListener('click', () => {
+      if (!trailer.muted && mezcla) {
+        // Apagar: rampa y luego mudo.
+        fundir('trailer', trailer, 0, 400, () => { trailer.muted = true; reflejarSonido(); });
+        return;
+      }
       trailer.muted = !trailer.muted;
       if (!trailer.muted) {
+        fundir('trailer', trailer, NIVEL.trailer, 900);
         try { trailer.volume = 1; } catch (error) { /* iOS */ }
         soundUnlocked = true;
         mudo = false;
@@ -226,12 +303,14 @@
 
   if (tocaButton && trailer) {
     tocaButton.addEventListener('click', () => {
+      armarMezcla(trailer, cancion);
       trailer.muted = false;
       const attempt = trailer.play();
       if (attempt && typeof attempt.catch === 'function') {
         attempt.catch(() => { trailer.muted = true; safePlay(trailer); });
       }
       soundUnlocked = true;
+      fundir('trailer', trailer, mudo ? 0 : NIVEL.trailer, 1200);
       tocaButton.hidden = true;
       reflejarSonido();
     });
@@ -258,14 +337,16 @@
     medallon.hidden = false;
     medallon.classList.remove('is-off');
     medallon.classList.add('is-on');
-    trailer.muted = true;
+    // El trailer baja en rampa antes de quedar mudo en el medallón.
+    fundir('trailer', trailer, 0, 650, () => { if (docked) trailer.muted = true; });
+    if (!mezcla) trailer.muted = true;
     hueco.appendChild(trailer);
     safePlay(trailer);
     if (trailerStarted && cancion) {
       cancion.muted = mudo;
-      try { cancion.volume = 0; } catch (error) { /* iOS */ }
+      if (!mezcla) { try { cancion.volume = 0; } catch (error) { /* iOS */ } }
       safePlay(cancion);
-      fadeAudio(cancion, 0.85, 1600);
+      fundir('cancion', cancion, mudo ? 0 : NIVEL.cancion, 1800);
       // Si el navegador la rechaza, se reintenta al primer toque siguiente.
       setTimeout(() => {
         if (cancion.paused && docked && !mudo) {
@@ -287,7 +368,8 @@
     trailer.muted = mudo || !soundUnlocked;
     reflejarSonido();
     safePlay(trailer);
-    if (cancion && !cancion.paused) fadeAudio(cancion, 0, 900, () => cancion.pause());
+    if (!trailer.muted) fundir('trailer', trailer, NIVEL.trailer, 1100);
+    if (cancion && !cancion.paused) fundir('cancion', cancion, 0, 900, () => { if (!docked) cancion.pause(); });
   }
 
   if (medallon) {
@@ -345,6 +427,7 @@
     if (document.hidden) {
       if (cancion && !cancion.paused) cancion.pause();
     } else {
+      despertarMezcla();
       safePlay(trailer);
       if (docked && trailerStarted && cancion && !mudo) safePlay(cancion);
     }
@@ -556,7 +639,10 @@
         window.scrollTo({ top: 0, behavior: reduceMotion ? 'instant' : 'smooth' });
         setTimeout(() => {
           try { trailer.currentTime = tc; } catch (error) { /* sin metadata */ }
-          if (soundUnlocked) trailer.muted = false;
+          if (soundUnlocked && !mudo) {
+            trailer.muted = false;
+            fundir('trailer', trailer, NIVEL.trailer, 900);
+          }
           reflejarSonido();
           safePlay(trailer);
         }, docked ? 700 : 80);
