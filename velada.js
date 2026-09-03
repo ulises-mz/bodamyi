@@ -483,9 +483,9 @@
         const step = (now) => {
           const k = clamp01((now - start) / duration);
           const eased = 1 - Math.pow(1 - k, 3);
-          monto.textContent = formatColones(40000 * eased);
+          monto.textContent = formatColones(38000 * eased);
           if (k < 1) requestAnimationFrame(step);
-          else monto.textContent = '40.000';
+          else monto.textContent = '38.000';
         };
         requestAnimationFrame(step);
       });
