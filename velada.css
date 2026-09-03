@@ -649,7 +649,7 @@ body.is-open .pantalla__video { transform: none; }
 /* ============================================================
    FIRMA
    ============================================================ */
-.firma { padding: 30px 24px 70px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.firma { padding: 30px 24px 150px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .firma__linea { display: flex; align-items: center; gap: 16px; }
 .firma__texto { font-size: 30px; line-height: 1; color: var(--choco); clip-path: inset(0 100% 0 0); }
 .is-in .firma__texto { animation: escribir 1.4s var(--suave) 0.2s forwards; }
@@ -725,6 +725,40 @@ body.is-open .pantalla__video { transform: none; }
 .paquete__horas span { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 9px 4px; border: 1px solid rgba(74,58,43,0.3); }
 .paquete__horas i { font-style: normal; font-size: 8px; color: var(--mute); text-align: center; }
 .paquete__horas b { font-weight: 400; font-size: 16px; }
+
+/* ============================================================
+   LAS FLORES · los ramos en acuarela de la invitación original, al fondo:
+   tintados hacia el lino, con grano solo donde hay flor (filtro SVG) y
+   fundidos en los bordes con una máscara radial. Siempre detrás del
+   contenido (z-index -1 dentro de cada sección aislada).
+   ============================================================ */
+.seccion, .firma, .hero__vista, .portada { isolation: isolate; }
+.seccion--con-flor, .firma { overflow: hidden; }
+.flor {
+  position: absolute; z-index: -1; pointer-events: none;
+  opacity: var(--op, 0.42);
+  -webkit-mask-image: radial-gradient(ellipse 62% 62% at 50% 50%, #000 30%, transparent 72%);
+  mask-image: radial-gradient(ellipse 62% 62% at 50% 50%, #000 30%, transparent 72%);
+}
+.flor img { display: block; width: 100%; height: auto; filter: sepia(0.35) saturate(0.6) brightness(1.02) contrast(0.92) url(#grano-flor); }
+.flor--portada-tl { width: 360px; left: -150px; top: -60px; transform: rotate(-18deg); --op: 0.38; }
+.flor--portada-br { width: 380px; right: -160px; bottom: -70px; transform: rotate(160deg); --op: 0.38; }
+.portada .flor { transition: filter 0.9s ease, opacity 0.9s ease; }
+.portada.is-opening .flor { filter: blur(2px); opacity: 0.2; }
+.flor--hero-tl { width: 320px; left: -130px; top: -10px; transform: rotate(-22deg); --op: 0.34; }
+.flor--hero-br { width: 340px; right: -140px; bottom: -30px; transform: rotate(158deg); --op: 0.34; }
+.flor--invitacion { width: 300px; right: -120px; top: -40px; transform: rotate(14deg); --op: 0.5; }
+.flor--lugar { width: 280px; left: -130px; top: 120px; transform: rotate(-12deg); --op: 0.4; }
+.flor--menu { width: 300px; left: -130px; bottom: -40px; transform: rotate(-160deg); --op: 0.5; }
+.flor--barra { width: 300px; right: -130px; top: -50px; transform: rotate(18deg); --op: 0.5; }
+.flor--rsvp { width: 280px; right: -120px; top: -20px; transform: rotate(10deg); --op: 0.4; }
+.flor--firma { width: 340px; left: 50%; bottom: -150px; margin-left: -170px; --op: 0.4; }
+@media (min-width: 900px) {
+  .flor--portada-tl { width: 520px; left: -120px; top: -80px; }
+  .flor--portada-br { width: 560px; right: -140px; bottom: -110px; }
+  .flor--hero-tl { width: 520px; left: -60px; top: 20px; }
+  .flor--hero-br { width: 560px; right: -80px; bottom: 0; }
+}
 
 /* ============================================================
    KEYFRAMES
