@@ -44,6 +44,8 @@
   const guestName = (params.get('invitado') || params.get('para') || '').trim().slice(0, 60);
   const guestNumber = (params.get('n') || '').trim().replace(/\D/g, '').slice(0, 4);
   const numberLabel = guestNumber ? `Invitación N.º ${guestNumber.padStart(3, '0')} · Reservado para` : '';
+  const sobreNombre = $('#sobre-nombre');
+  if (guestName && sobreNombre) sobreNombre.textContent = guestName;
   [['#invitado', '#reservado-k'], ['#portada-invitado', '#portada-k']].forEach(([nameSel, labelSel]) => {
     const nameEl = $(nameSel);
     const labelEl = $(labelSel);
@@ -146,7 +148,7 @@
       document.body.classList.remove('is-locked');
       window.scrollTo(0, 0);
       frame();
-    }, reduceMotion ? 50 : 1250);
+    }, reduceMotion ? 50 : 5950);
   }
   if (abrirButton) abrirButton.addEventListener('click', abrir);
   if (!portada) {

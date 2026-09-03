@@ -17,8 +17,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Jost:wght@300;400;500&family=Pinyon+Script&display=swap" rel="stylesheet">
-  <link rel="preload" as="image" href="savethedate-poster.jpg?v=20260903f">
-  <link rel="stylesheet" href="velada.css?v=20260903f">
+  <link rel="preload" as="image" href="savethedate-poster.jpg?v=20260903h">
+  <link rel="stylesheet" href="velada.css?v=20260903h">
 </head>
 <body>
 
@@ -67,28 +67,51 @@
   </defs>
 </svg>
 
-<!-- ══════════════ 00 · LA PORTADA · el sobre personalizado ══════════════ -->
+<!-- ══════════════ 00 · LA PORTADA · la carta que se abre ══════════════ -->
 <div class="portada" id="portada">
   <div class="hojas" id="portada-hojas" aria-hidden="true"></div>
-  <div class="sobre" id="sobre">
-    <div class="encaje encaje--arriba" aria-hidden="true"></div>
-    <article class="tarjeta sobre__tarjeta">
-      <svg class="escudo" aria-hidden="true"><use href="#escudo"></use></svg>
-      <p class="didone sobre__nombres">Inés <span class="hero__amp">&amp;</span> Marcel</p>
-      <p class="caps sobre__fecha">27 · XI · MMXXVI · Vino Mundo</p>
-      <div class="ornamento" aria-hidden="true"><span></span><svg class="rombo"><use href="#rombo"></use></svg><span></span></div>
-      <p class="caps reservado__k" id="portada-k">Reservado para</p>
-      <p class="script sobre__invitado" id="portada-invitado">un invitado muy especial</p>
-    </article>
-    <div class="encaje encaje--abajo" aria-hidden="true"></div>
-    <div class="sobre__liston script" aria-hidden="true">reservado</div>
-    <button type="button" class="sobre__sello lacre" id="abrir" aria-label="Abrir la invitación">
-      <img class="lacre__img" src="sello.webp?v=20260903f" alt="" decoding="async">
-      <span class="lacre__mono didone" aria-hidden="true">I&amp;M</span>
-      <span class="sobre__halo" aria-hidden="true"></span>
-    </button>
-    <p class="caps sobre__pista">Toca el sello para abrir</p>
+  <div class="escena">
+    <div class="sobre3d" id="sobre3d">
+      <div class="sobre3d__dorso sobre3d__pieza" aria-hidden="true"></div>
+
+      <!-- La carta, doblada por la mitad dentro del sobre -->
+      <div class="carta" id="carta">
+        <div class="carta__mitad carta__mitad--arriba">
+          <svg class="escudo escudo--chico" aria-hidden="true"><use href="#escudo"></use></svg>
+          <p class="didone carta__nombres">Inés <span class="hero__amp">&amp;</span> Marcel</p>
+          <p class="caps carta__fecha">27 · 11 · 2026 · Vino Mundo</p>
+          <div class="ornamento ornamento--corto" aria-hidden="true"><span></span><svg class="rombo"><use href="#rombo"></use></svg><span></span></div>
+        </div>
+        <div class="carta__mitad carta__mitad--abajo">
+          <div class="carta__cara carta__cara--frente">
+            <p class="caps reservado__k" id="portada-k">Reservado para</p>
+            <p class="script carta__invitado" id="portada-invitado">un invitado muy especial</p>
+            <p class="caps carta__nota">Tenemos el honor de invitarte</p>
+          </div>
+          <div class="carta__cara carta__cara--dorso" aria-hidden="true"></div>
+        </div>
+        <span class="carta__brillo" aria-hidden="true"></span>
+      </div>
+
+      <div class="sobre3d__bolsillo sobre3d__pieza" aria-hidden="true">
+        <p class="caps sobre3d__para">Para</p>
+        <p class="script sobre3d__nombre" id="sobre-nombre">un invitado especial</p>
+      </div>
+      <div class="sobre3d__solapa sobre3d__pieza" aria-hidden="true">
+        <span class="sobre3d__cara sobre3d__cara--fuera"></span>
+        <span class="sobre3d__cara sobre3d__cara--dentro"></span>
+      </div>
+      <div class="sobre3d__liston sobre3d__pieza" aria-hidden="true">
+        <svg class="sobre3d__lazo" viewBox="0 0 28 22"><use href="#lazo"></use></svg>
+      </div>
+      <button type="button" class="sobre3d__sello sobre3d__pieza" id="abrir" aria-label="Abrir la invitación">
+        <span class="lacre lacre--mitad lacre--izq" aria-hidden="true"><img class="lacre__img" src="sello.webp?v=20260903h" alt="" decoding="async"><span class="lacre__mono didone">I&amp;M</span></span>
+        <span class="lacre lacre--mitad lacre--der" aria-hidden="true"><img class="lacre__img" src="sello.webp?v=20260903h" alt="" decoding="async"><span class="lacre__mono didone">I&amp;M</span></span>
+        <span class="sobre__halo" aria-hidden="true"></span>
+      </button>
+    </div>
   </div>
+  <p class="caps sobre__pista" id="sobre-pista">Toca el sello para abrir</p>
 </div>
 
 <div class="pagina">
@@ -136,12 +159,12 @@
           <div class="arco__filete" aria-hidden="true"></div>
           <div class="arco" id="arco" aria-hidden="true"></div>
           <div class="liston script" id="liston" aria-hidden="true">reservado</div>
-          <span class="lacre sello--hero" aria-hidden="true"><img class="lacre__img" src="sello.webp?v=20260903f" alt="" decoding="async"><span class="lacre__mono didone">I&amp;M</span></span>
+          <span class="lacre sello--hero" aria-hidden="true"><img class="lacre__img" src="sello.webp?v=20260903h" alt="" decoding="async"><span class="lacre__mono didone">I&amp;M</span></span>
         </div>
 
         <h1 class="didone hero__nombres">Inés <span class="hero__amp">&amp;</span> Marcel</h1>
         <div class="hero__fecha">
-          <p class="caps hero__romana"><i></i><span>27 · XI · MMXXVI</span><i></i></p>
+          <p class="caps hero__romana"><i></i><span>27 · 11 · 2026</span><i></i></p>
           <p class="caps hero__dia">Viernes</p>
         </div>
         <a class="caps hero__desliza" href="#invitacion">
@@ -152,9 +175,9 @@
 
       <!-- El trailer: pantalla completa al abrir, se recoge hasta el arco al deslizar -->
       <div class="pantalla" id="pantalla">
-        <video id="trailer" class="pantalla__video" playsinline webkit-playsinline muted autoplay loop preload="auto" poster="savethedate-poster.jpg?v=20260903f">
-          <source src="savethedate.m4v?v=20260903f" type="video/mp4">
-          <source src="savethedate.mp4?v=20260903f" type="video/mp4">
+        <video id="trailer" class="pantalla__video" playsinline webkit-playsinline muted autoplay loop preload="auto" poster="savethedate-poster.jpg?v=20260903h">
+          <source src="savethedate.m4v?v=20260903h" type="video/mp4">
+          <source src="savethedate.mp4?v=20260903h" type="video/mp4">
         </video>
         <div class="pantalla__velo" aria-hidden="true"></div>
         <p class="caps pantalla__marca">Save the date · 00:46</p>
@@ -208,8 +231,8 @@
 
       <div class="minifilm r" id="minifilm" style="--i: 2" role="img" aria-label="Vino Mundo: el salón del acto civil y el de la cena">
         <div class="minifilm__barra minifilm__barra--arriba"></div>
-        <img class="minifilm__escena minifilm__escena--1" src="venue-civil.jpg?v=20260903f" alt="" loading="lazy" decoding="async">
-        <img class="minifilm__escena minifilm__escena--2" src="venue-cena.jpg?v=20260903f" alt="" loading="lazy" decoding="async">
+        <img class="minifilm__escena minifilm__escena--1" src="venue-civil.jpg?v=20260903h" alt="" loading="lazy" decoding="async">
+        <img class="minifilm__escena minifilm__escena--2" src="venue-cena.jpg?v=20260903h" alt="" loading="lazy" decoding="async">
         <div class="minifilm__vineta"></div>
         <div class="minifilm__grano"></div>
         <div class="minifilm__rotulo minifilm__rotulo--1"><span class="didone">El sí</span><span class="caps">Acto civil · 5:00 PM</span></div>
@@ -234,11 +257,11 @@
       <div class="carrete r" id="carrete" style="--i: 1">
         <div class="carrete__perf" aria-hidden="true"></div>
         <div class="carrete__pista" id="pista">
-          <figure class="fotograma" data-tc="33"><img src="fotograma-d.jpg?v=20260903f" alt="Inés y Marcel" loading="lazy" decoding="async"><figcaption class="caps">01 · TC 00:33</figcaption></figure>
-          <figure class="fotograma" data-tc="24"><img src="fotograma-b.jpg?v=20260903f" alt="Inés" loading="lazy" decoding="async"><figcaption class="caps">02 · TC 00:24</figcaption></figure>
-          <figure class="fotograma" data-tc="14"><img src="fotograma-e.jpg?v=20260903f" alt="" loading="lazy" decoding="async"><figcaption class="caps">03 · TC 00:14</figcaption></figure>
-          <figure class="fotograma" data-tc="7"><img src="fotograma-a.jpg?v=20260903f" alt="" loading="lazy" decoding="async"><figcaption class="caps">04 · TC 00:07</figcaption></figure>
-          <figure class="fotograma fotograma--foto"><img src="fotograma-novios.jpg?v=20260903f" alt="Inés y Marcel" loading="lazy" decoding="async"><figcaption class="caps">05 · Fotografía</figcaption></figure>
+          <figure class="fotograma" data-tc="33"><img src="fotograma-d.jpg?v=20260903h" alt="Inés y Marcel" loading="lazy" decoding="async"><figcaption class="caps">01 · TC 00:33</figcaption></figure>
+          <figure class="fotograma" data-tc="24"><img src="fotograma-b.jpg?v=20260903h" alt="Inés" loading="lazy" decoding="async"><figcaption class="caps">02 · TC 00:24</figcaption></figure>
+          <figure class="fotograma" data-tc="14"><img src="fotograma-e.jpg?v=20260903h" alt="" loading="lazy" decoding="async"><figcaption class="caps">03 · TC 00:14</figcaption></figure>
+          <figure class="fotograma" data-tc="7"><img src="fotograma-a.jpg?v=20260903h" alt="" loading="lazy" decoding="async"><figcaption class="caps">04 · TC 00:07</figcaption></figure>
+          <figure class="fotograma fotograma--foto"><img src="fotograma-novios.jpg?v=20260903h" alt="Inés y Marcel" loading="lazy" decoding="async"><figcaption class="caps">05 · Fotografía</figcaption></figure>
         </div>
         <div class="carrete__perf" aria-hidden="true"></div>
       </div>
@@ -248,28 +271,71 @@
       </p>
     </section>
 
-    <!-- ══════════════ 05 · LA FECHA Y LA VESTIMENTA ══════════════ -->
+    <!-- ══════════════ 05 · LA FECHA ══════════════ -->
     <section class="seccion reveal" id="detalles">
-      <div class="bento">
-        <div class="tarjeta-fecha r" style="--i: 0">
-          <div class="tarjeta-fecha__filete" aria-hidden="true"></div>
-          <svg class="tarjeta-fecha__rama" aria-hidden="true"><use href="#ramita"></use></svg>
+      <div class="tarjeta-fecha tarjeta-fecha--ancha r" style="--i: 0">
+        <div class="tarjeta-fecha__filete" aria-hidden="true"></div>
+        <svg class="tarjeta-fecha__rama" aria-hidden="true"><use href="#ramita"></use></svg>
+        <span class="didone tarjeta-fecha__num">27</span>
+        <div class="tarjeta-fecha__col">
           <span class="caps">Viernes</span>
-          <span class="didone tarjeta-fecha__num">27</span>
-          <span class="caps tarjeta-fecha__mes">Noviembre · 2026</span>
+          <span class="didone tarjeta-fecha__mes">Noviembre</span>
+          <span class="caps tarjeta-fecha__anio">2026</span>
+          <span class="caps tarjeta-fecha__horas">Acto civil 5:00 PM · Cena 7:00 PM</span>
         </div>
-        <div class="tarjeta tarjeta--redonda r" style="--i: 1">
-          <span class="caps tarjeta__k">Vestimenta</span>
-          <span class="didone tarjeta__v">Coctel o midi<br>Traje formal</span>
-          <div class="muestras" aria-label="Colores que pedimos evitar">
-            <div class="muestra"><span class="muestra__color" style="background:#b3302a"><svg viewBox="0 0 30 30"><path class="tacha tacha--clara" style="--i: 0" d="M5 25 L25 5"></path></svg></span><span class="muestra__nombre">Rojo</span></div>
-            <div class="muestra"><span class="muestra__color" style="background:#22398f"><svg viewBox="0 0 30 30"><path class="tacha tacha--clara" style="--i: 1" d="M5 25 L25 5"></path></svg></span><span class="muestra__nombre">Azul rey</span></div>
-            <div class="muestra"><span class="muestra__color" style="background:#1d7c58"><svg viewBox="0 0 30 30"><path class="tacha tacha--clara" style="--i: 2" d="M5 25 L25 5"></path></svg></span><span class="muestra__nombre">Esmeralda</span></div>
-            <div class="muestra"><span class="muestra__color" style="background:#f0c419"><svg viewBox="0 0 30 30"><path class="tacha" style="--i: 3" d="M5 25 L25 5"></path></svg></span><span class="muestra__nombre">Brillantes</span></div>
-            <div class="muestra"><span class="muestra__color muestra__color--blanco" style="background:#ffffff"><svg viewBox="0 0 30 30"><path class="tacha" style="--i: 4" d="M5 25 L25 5"></path></svg></span><span class="muestra__nombre">Blancos</span></div>
-            <div class="muestra"><span class="muestra__color" style="background:#d8c6a2"><svg viewBox="0 0 30 30"><path class="tacha" style="--i: 5" d="M5 25 L25 5"></path></svg></span><span class="muestra__nombre">Beige</span></div>
-          </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ 06 · LA VESTIMENTA · figurines y el muestrario del sastre ══════════════ -->
+    <section class="seccion reveal" id="vestimenta">
+      <div class="divisor r" style="--i: 0" aria-hidden="true"><span></span><svg class="divisor__rama"><use href="#ramita"></use></svg><span></span></div>
+      <p class="caps seccion__rotulo r" style="--i: 1">Vestimenta</p>
+      <div class="figurines r" style="--i: 2">
+        <figure class="figurin">
+          <svg class="figurin__svg" viewBox="0 0 120 240" aria-hidden="true">
+            <circle class="trazo" cx="60" cy="22" r="11" pathLength="100"></circle>
+            <path class="trazo" d="M49 16 Q60 2 71 16" pathLength="100"></path>
+            <path class="trazo" d="M56 33 v8 M64 33 v8" pathLength="100"></path>
+            <path class="trazo" d="M42 52 Q60 44 78 52" pathLength="100"></path>
+            <path class="trazo" d="M42 52 L38 92 Q60 98 82 92 L78 52" pathLength="100"></path>
+            <path class="trazo" d="M42 54 Q28 70 30 96 M78 54 Q92 70 90 96" pathLength="100"></path>
+            <path class="trazo" d="M38 92 Q22 150 26 190 Q60 200 94 190 Q98 150 82 92" pathLength="100"></path>
+            <path class="trazo trazo--fino" d="M52 100 Q50 150 46 188 M68 100 Q70 150 74 188" pathLength="100"></path>
+            <path class="trazo" d="M50 190 L48 226 M70 190 L72 226" pathLength="100"></path>
+            <path class="trazo" d="M42 228 h12 M66 228 h12" pathLength="100"></path>
+          </svg>
+          <figcaption><span class="didone figurin__quien">Ella</span><span class="caps figurin__que">Coctel o midi</span></figcaption>
+        </figure>
+        <figure class="figurin">
+          <svg class="figurin__svg" viewBox="0 0 120 240" aria-hidden="true">
+            <circle class="trazo" cx="60" cy="22" r="11" pathLength="100"></circle>
+            <path class="trazo" d="M50 15 Q60 6 70 15" pathLength="100"></path>
+            <path class="trazo" d="M56 33 v6 M64 33 v6" pathLength="100"></path>
+            <path class="trazo" d="M36 46 L60 40 L84 46" pathLength="100"></path>
+            <path class="trazo" d="M36 46 L34 130 L86 130 L84 46" pathLength="100"></path>
+            <path class="trazo" d="M60 40 L50 60 L58 100 M60 40 L70 60 L62 100 M60 100 L60 130" pathLength="100"></path>
+            <path class="trazo trazo--fino" d="M60 42 L57 52 L60 90 L63 52 Z" pathLength="100"></path>
+            <circle class="trazo" cx="60" cy="110" r="1.4" pathLength="100"></circle>
+            <circle class="trazo" cx="60" cy="120" r="1.4" pathLength="100"></circle>
+            <path class="trazo" d="M36 48 Q26 80 30 118 q0 6 4 8 M84 48 Q94 80 90 118 q0 6 -4 8" pathLength="100"></path>
+            <path class="trazo" d="M42 130 L44 226 M78 130 L76 226 M60 132 L60 226" pathLength="100"></path>
+            <path class="trazo" d="M40 228 h20 M60 228 h20" pathLength="100"></path>
+          </svg>
+          <figcaption><span class="didone figurin__quien">Él</span><span class="caps figurin__que">Traje formal</span></figcaption>
+        </figure>
+      </div>
+      <div class="muestrario r" style="--i: 3" aria-label="Colores que pedimos evitar">
+        <div class="muestrario__abanico" aria-hidden="true">
+        <span class="muestra3" style="--i: 0; --ang: -35deg; background-color: #b3302a;"><svg viewBox="0 0 46 72" aria-hidden="true"><path class="tacha tacha--clara" style="--i: 0" d="M8 64 L38 8"></path></svg></span>
+        <span class="muestra3" style="--i: 1; --ang: -21deg; background-color: #22398f;"><svg viewBox="0 0 46 72" aria-hidden="true"><path class="tacha tacha--clara" style="--i: 1" d="M8 64 L38 8"></path></svg></span>
+        <span class="muestra3" style="--i: 2; --ang: -7deg; background-color: #1d7c58;"><svg viewBox="0 0 46 72" aria-hidden="true"><path class="tacha tacha--clara" style="--i: 2" d="M8 64 L38 8"></path></svg></span>
+        <span class="muestra3" style="--i: 3; --ang: 7deg; background-color: #f0c419;"><svg viewBox="0 0 46 72" aria-hidden="true"><path class="tacha" style="--i: 3" d="M8 64 L38 8"></path></svg></span>
+        <span class="muestra3 muestra3--blanca" style="--i: 4; --ang: 21deg; background-color: #ffffff;"><svg viewBox="0 0 46 72" aria-hidden="true"><path class="tacha" style="--i: 4" d="M8 64 L38 8"></path></svg></span>
+        <span class="muestra3" style="--i: 5; --ang: 35deg; background-color: #d8c6a2;"><svg viewBox="0 0 46 72" aria-hidden="true"><path class="tacha" style="--i: 5" d="M8 64 L38 8"></path></svg></span>
+          <span class="muestrario__alfiler"></span>
         </div>
+        <p class="caps muestrario__titulo">Por favor evita estos tonos</p>
+        <p class="caps muestrario__lista">Rojo · Azul rey · Esmeralda · Brillantes · Blancos · Beige</p>
       </div>
     </section>
 
@@ -310,6 +376,48 @@
           <span class="caps sinpe__ok" id="sinpe-ok" hidden>Copiado</span>
         </button>
         <p class="tarjeta__nota">El pago se entrega directamente al restaurante,<br>por lo que no hay devoluciones.</p>
+      </article>
+      <div class="encaje encaje--abajo r" style="--i: 2" aria-hidden="true"></div>
+    </section>
+
+    <!-- ══════════════ LA BARRA · para quien desee alcohol adicional ══════════════ -->
+    <section class="seccion seccion--piedra reveal" id="barra">
+      <svg class="rama-fondo rama-fondo--tl" aria-hidden="true"><use href="#ramita"></use></svg>
+      <svg class="rama-fondo rama-fondo--br" aria-hidden="true"><use href="#ramita"></use></svg>
+      <div class="encaje encaje--arriba r" style="--i: 0" aria-hidden="true"></div>
+      <article class="tarjeta tarjeta--esquinas r" style="--i: 1">
+        <svg class="esquina esquina--tl" aria-hidden="true"><use href="#esquina"></use></svg>
+        <svg class="esquina esquina--tr" aria-hidden="true"><use href="#esquina"></use></svg>
+        <svg class="esquina esquina--bl" aria-hidden="true"><use href="#esquina"></use></svg>
+        <svg class="esquina esquina--br" aria-hidden="true"><use href="#esquina"></use></svg>
+        <div class="tarjeta__titulo">
+          <span class="didone tarjeta__menu">LA BARRA</span>
+          <div class="ornamento ornamento--corto" aria-hidden="true"><span></span><svg class="rombo"><use href="#rombo"></use></svg><span></span></div>
+        </div>
+        <p class="caps tarjeta__honor">¿Deseas alcohol adicional?</p>
+        <p class="tarjeta__nota">Paquetes por persona, impuestos incluidos.<br>Se coordinan y se pagan con la wedding planner.</p>
+        <div class="paquetes">
+          <div class="paquete">
+            <p class="didone paquete__nombre">Vino y cerveza</p>
+            <p class="paquete__desc">Vino de la casa blanco y tinto · Cervezas nacionales</p>
+            <div class="paquete__horas"><span><i class="caps">2 h</i><b class="didone">₡8.500</b></span><span><i class="caps">3 h</i><b class="didone">₡10.500</b></span><span><i class="caps">4 h</i><b class="didone">₡12.900</b></span><span><i class="caps">5 h</i><b class="didone">₡15.400</b></span></div>
+          </div>
+          <div class="paquete">
+            <p class="didone paquete__nombre">Vino, cerveza y sangría</p>
+            <p class="paquete__desc">Vino de la casa · Cervezas nacionales · Sangría blanca y tinta</p>
+            <div class="paquete__horas"><span><i class="caps">2 h</i><b class="didone">₡11.500</b></span><span><i class="caps">3 h</i><b class="didone">₡13.700</b></span><span><i class="caps">4 h</i><b class="didone">₡15.900</b></span><span><i class="caps">5 h</i><b class="didone">₡18.900</b></span></div>
+          </div>
+          <div class="paquete">
+            <p class="didone paquete__nombre">Sangría</p>
+            <p class="paquete__desc">Sangría tinta y blanca</p>
+            <div class="paquete__horas"><span><i class="caps">2 h</i><b class="didone">₡8.500</b></span><span><i class="caps">Hora adicional</i><b class="didone">₡3.900</b></span></div>
+          </div>
+          <div class="paquete">
+            <p class="didone paquete__nombre">Gin tonics</p>
+            <p class="paquete__desc">Clásico, frutos rojos, maracuyá, naranja cardamomo</p>
+            <div class="paquete__horas"><span><i class="caps">2 h</i><b class="didone">₡6.500</b></span><span><i class="caps">Hora adicional</i><b class="didone">₡2.800</b></span></div>
+          </div>
+        </div>
       </article>
       <div class="encaje encaje--abajo r" style="--i: 2" aria-hidden="true"></div>
     </section>
@@ -403,7 +511,7 @@
       <p class="rsvp__deadline caps" id="rsvp-deadline-note" hidden>Las confirmaciones se cerraron el 15 de septiembre de 2026.</p>
 
       <div class="rsvp__thanks" id="rsvp-thanks" hidden>
-        <span class="lacre sello--gracias" aria-hidden="true"><img class="lacre__img" src="sello.webp?v=20260903f" alt="" decoding="async"><span class="lacre__mono didone">I&amp;M</span></span>
+        <span class="lacre sello--gracias" aria-hidden="true"><img class="lacre__img" src="sello.webp?v=20260903h" alt="" decoding="async"><span class="lacre__mono didone">I&amp;M</span></span>
         <p class="rsvp__summary" id="rsvp-summary"></p>
         <button type="button" class="boton caps" id="rsvp-edit-btn">Editar respuesta</button>
       </div>
@@ -413,17 +521,17 @@
     <footer class="firma reveal">
       <div class="firma__linea r" style="--i: 0">
         <span class="script firma__texto" id="firma">con amor,</span>
-        <span class="lacre sello--firma" aria-hidden="true"><img class="lacre__img" src="sello.webp?v=20260903f" alt="" decoding="async"><span class="lacre__mono didone">I&amp;M</span></span>
+        <span class="lacre sello--firma" aria-hidden="true"><img class="lacre__img" src="sello.webp?v=20260903h" alt="" decoding="async"><span class="lacre__mono didone">I&amp;M</span></span>
       </div>
-      <p class="caps firma__pie r" style="--i: 1">Vino Mundo · 27 · XI · MMXXVI</p>
+      <p class="caps firma__pie r" style="--i: 1">Vino Mundo · 27 · 11 · 2026</p>
     </footer>
   </main>
 </div>
 
-<audio id="cancion" src="cancion.mp3?v=20260903f" preload="none" loop></audio>
+<audio id="cancion" src="cancion.mp3?v=20260903h" preload="none" loop></audio>
 
-<script src="rsvp-api.js?v=20260903f"></script>
-<script src="rsvp.js?v=20260903f"></script>
-<script src="velada.js?v=20260903f"></script>
+<script src="rsvp-api.js?v=20260903h"></script>
+<script src="rsvp.js?v=20260903h"></script>
+<script src="velada.js?v=20260903h"></script>
 </body>
 </html>
