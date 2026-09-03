@@ -81,7 +81,11 @@ a { color: var(--salvia); text-decoration: none; }
 .esquina--tr { right: 10px; top: 10px; transform: scaleX(-1); }
 .esquina--bl { left: 10px; bottom: 10px; transform: scaleY(-1); }
 .esquina--br { right: 10px; bottom: 10px; transform: scale(-1, -1); }
-.sello { width: 64px; height: 64px; }
+/* La cera de verdad (sello.webp, la misma de la invitación original), tintada a
+   chocolate con un filtro y con el monograma grabado en marfil encima. */
+.lacre { position: relative; display: grid; place-items: center; width: 64px; height: 64px; }
+.lacre__img { grid-area: 1 / 1; width: 100%; height: 100%; object-fit: contain; filter: sepia(0.7) saturate(1.05) brightness(0.56) contrast(1.1); }
+.lacre__mono { grid-area: 1 / 1; font-size: 17px; letter-spacing: 0.08em; color: #efe6d6; text-shadow: 0 -1px 0 rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.16); transform: translateY(-3%); pointer-events: none; line-height: 1; }
 
 /* ============================================================
    00 · LA PORTADA · el sobre personalizado que se abre con el sello
@@ -118,9 +122,10 @@ html.is-locked, body.is-locked { overflow: hidden; height: 100%; }
   transition: transform 0.8s var(--suave), opacity 0.6s ease;
 }
 .portada.is-opening .sobre__liston { transform: translate(90px, 20px) rotate(-16deg); opacity: 0; }
-.sobre__sello { position: absolute; left: 50%; bottom: 6px; width: 78px; height: 78px; margin-left: -39px; transform-origin: 50% 50%; }
-.sobre__sello svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 10px 18px rgba(74,58,43,0.35)); }
-.sobre__sello:active svg { transform: scale(0.94); }
+.sobre__sello { position: absolute; left: 50%; bottom: 4px; width: 82px; height: 82px; margin-left: -41px; transform-origin: 50% 50%; }
+.sobre__sello .lacre__img { filter: sepia(0.7) saturate(1.05) brightness(0.56) contrast(1.1) drop-shadow(0 10px 18px rgba(74,58,43,0.4)); transition: transform 0.2s var(--suave); }
+.sobre__sello .lacre__mono { font-size: 22px; }
+.sobre__sello:active .lacre__img { transform: scale(0.94); }
 .sobre__halo { position: absolute; inset: -8px; border-radius: 50%; border: 1px solid rgba(74,58,43,0.5); animation: pulso 2.2s ease-out infinite; pointer-events: none; }
 .portada.is-opening .sobre__sello { animation: romper 0.7s var(--suave) forwards; }
 .sobre__pista { position: absolute; left: 0; right: 0; bottom: -36px; margin: 0; text-align: center; font-size: 9px; color: var(--mute-claro); }
@@ -155,7 +160,7 @@ html.is-locked, body.is-locked { overflow: hidden; height: 100%; }
 
 /* Lo que rodea al arco aparece a medida que el trailer se recoge (--tc lo pone velada.js) */
 .hero__contenido {
-  position: relative; z-index: 1;
+  position: relative; z-index: 6; pointer-events: none;
   width: 100%; flex-grow: 1;
   display: flex; flex-direction: column; align-items: center; gap: 18px;
   opacity: var(--tc, 0);
@@ -170,7 +175,7 @@ html.is-locked, body.is-locked { overflow: hidden; height: 100%; }
 .rama .brotes { opacity: 0; }
 .rama .brotes circle { fill: var(--salvia); }
 .arco__filete { position: absolute; inset: -9px; border-radius: 149px 149px 22px 22px; border: 1px solid rgba(74,58,43,0.45); pointer-events: none; }
-.arco { position: absolute; inset: 0; border-radius: 140px 140px 16px 16px; background: #d9d1c1; box-shadow: 0 0 0 1px rgba(74,58,43,0.7), 0 26px 50px rgba(74,58,43,0.22); }
+.arco { position: absolute; inset: 0; border-radius: 140px 140px 16px 16px; background: transparent; box-shadow: 0 0 0 1px rgba(74,58,43,0.7), 0 26px 50px rgba(74,58,43,0.22); }
 .liston {
   position: absolute; left: -22px; bottom: 2px;
   width: 212px; height: 36px; padding-right: 40px;
@@ -187,7 +192,7 @@ html.is-locked, body.is-locked { overflow: hidden; height: 100%; }
 .hero__romana { display: flex; align-items: center; gap: 12px; margin: 0; font-size: 12px; letter-spacing: 0.36em; }
 .hero__romana i { width: 26px; height: 1px; background: var(--choco); }
 .hero__dia { margin: 0; font-size: 9px; color: var(--mute); }
-.hero__desliza { margin-top: auto; padding-top: 24px; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 9px; color: var(--mute-claro); }
+.hero__desliza { pointer-events: auto; margin-top: auto; padding-top: 24px; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 9px; color: var(--mute-claro); }
 .hero__desliza svg { width: 14px; height: 14px; animation: flotar 1.8s ease-in-out infinite; }
 
 /* Cuando el trailer ya encajó en el arco, el marco cobra vida */
@@ -519,7 +524,8 @@ body.is-open .pantalla__video { transform: none; }
 .rsvp__status[data-type="warning"] { border-color: var(--salvia); color: var(--salvia); }
 .rsvp__deadline { margin: 0; font-size: 9px; color: var(--mute); text-align: center; }
 .rsvp__thanks { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 26px 22px; background: var(--tarjeta); border: 1px solid var(--hair-fuerte); box-shadow: inset 0 0 0 6px var(--tarjeta), inset 0 0 0 7px rgba(74,58,43,0.5); text-align: center; }
-.sello--gracias { width: 72px; height: 72px; animation: sellar 0.7s var(--rebote); }
+.sello--gracias { width: 74px; height: 74px; animation: sellar 0.7s var(--rebote); }
+.sello--gracias .lacre__mono { font-size: 20px; }
 .rsvp__summary { margin: 0; white-space: pre-line; font-size: 14px; line-height: 1.6; }
 .rsvp__thanks .boton { width: 100%; }
 
@@ -530,7 +536,8 @@ body.is-open .pantalla__video { transform: none; }
 .firma__linea { display: flex; align-items: center; gap: 16px; }
 .firma__texto { font-size: 30px; line-height: 1; color: var(--choco); clip-path: inset(0 100% 0 0); }
 .is-in .firma__texto { animation: escribir 1.4s var(--suave) 0.2s forwards; }
-.sello--firma { width: 52px; height: 52px; }
+.sello--firma { width: 54px; height: 54px; }
+.sello--firma .lacre__mono { font-size: 14px; }
 .firma__pie { margin: 0; font-size: 9px; color: var(--mute-claro); }
 
 /* ============================================================
