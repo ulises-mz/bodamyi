@@ -350,6 +350,22 @@
     }
   });
 
+  /* ── 5b. Las flores aparecen solo cuando están decodificadas del todo:
+        nada de verlas llegar a medias. ── */
+  $$('.flor img').forEach((img) => {
+    const flor = img.closest('.flor');
+    const lista = () => { if (flor) flor.classList.add('is-lista'); };
+    const decodificar = () => {
+      if (typeof img.decode === 'function') img.decode().then(lista).catch(lista);
+      else lista();
+    };
+    if (img.complete && img.naturalWidth) decodificar();
+    else {
+      img.addEventListener('load', decodificar, { once: true });
+      img.addEventListener('error', lista, { once: true });
+    }
+  });
+
   /* ── 6. Revelados: cada sección entra una vez, sus hijos .r escalonados ── */
   const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {

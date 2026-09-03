@@ -666,7 +666,7 @@ body.is-open .pantalla__video { transform: none; }
 /* ============================================================
    FIRMA
    ============================================================ */
-.firma { padding: 30px 24px 150px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.firma { position: relative; padding: 30px 24px 230px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .firma__linea { display: flex; align-items: center; gap: 16px; }
 .firma__texto { font-size: 30px; line-height: 1; color: var(--choco); clip-path: inset(0 100% 0 0); }
 .is-in .firma__texto { animation: escribir 1.4s var(--suave) 0.2s forwards; }
@@ -753,9 +753,10 @@ body.is-open .pantalla__video { transform: none; }
 .seccion--con-flor, .firma { overflow: hidden; }
 .flor {
   position: absolute; z-index: -1; pointer-events: none;
-  transform: translateZ(0); backface-visibility: hidden;
-  opacity: var(--op, 0.42);
+  opacity: 0;
+  transition: opacity 1.1s ease;
 }
+.flor.is-lista { opacity: var(--op, 0.42); }
 .flor img { display: block; width: 100%; height: auto; }
 .flor--portada-tl { width: 360px; left: -150px; top: -60px; transform: rotate(-18deg); --op: 0.38; }
 .flor--portada-br { width: 380px; right: -160px; bottom: -70px; transform: rotate(160deg); --op: 0.38; }
@@ -768,7 +769,7 @@ body.is-open .pantalla__video { transform: none; }
 .flor--menu { width: 300px; left: -130px; bottom: -40px; transform: rotate(-160deg); --op: 0.5; }
 .flor--barra { width: 300px; right: -130px; top: -50px; transform: rotate(18deg); --op: 0.5; }
 .flor--rsvp { width: 280px; right: -120px; top: -20px; transform: rotate(10deg); --op: 0.4; }
-.flor--firma { width: 340px; left: 50%; bottom: -150px; margin-left: -170px; --op: 0.4; }
+.flor--firma { width: 340px; left: 50%; bottom: -60px; margin-left: -170px; --op: 0.4; }
 @media (min-width: 900px) {
   .flor--portada-tl { width: 520px; left: -120px; top: -80px; }
   .flor--portada-br { width: 560px; right: -140px; bottom: -110px; }
