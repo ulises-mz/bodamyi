@@ -1,10 +1,12 @@
 /* ============================================================
    velada.js — Inés & Marcel · La Velada
-   La coreografía: la première del trailer, el medallón, las hojas,
-   el mini-film del lugar, el carrete, los revelados y los detalles.
-   Reglas de rendimiento: solo transform/opacity, IntersectionObserver
-   para todo lo que depende del scroll, rAF acotado y nada corriendo
-   cuando no se ve.
+   La coreografía completa: la portada que se abre con el sello, el
+   trailer a pantalla completa que se recoge en el arco al deslizar,
+   el medallón, las hojas, el mini-film del lugar, el carrete, los
+   revelados y los detalles.
+   Reglas de rendimiento: solo transform/opacity/clip-path, un único
+   rAF acotado para el scroll, IntersectionObserver para lo demás y
+   nada corriendo cuando no se ve.
    ============================================================ */
 (() => {
   'use strict';
@@ -12,6 +14,8 @@
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp01 = (n) => Math.min(1, Math.max(0, n));
+  const easeInOut = (k) => (k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2);
 
   function safePlay(media) {
     if (!media) return;
@@ -19,15 +23,15 @@
     if (attempt && typeof attempt.catch === 'function') attempt.catch(() => {});
   }
 
-  /* iOS ignora volume (siempre 1): el fundido simplemente no se nota
-     ahí, pero play/pause siguen funcionando. */
+  /* iOS ignora volume (siempre 1): el fundido no se nota ahí, pero
+     play/pause siguen funcionando. */
   function fadeAudio(audio, to, ms, done) {
     if (!audio) return;
     cancelAnimationFrame(audio.__fade || 0);
     const from = audio.volume;
     const start = performance.now();
     const step = (now) => {
-      const k = Math.min(1, (now - start) / ms);
+      const k = clamp01((now - start) / ms);
       try { audio.volume = from + (to - from) * k; } catch (error) { /* iOS */ }
       if (k < 1) audio.__fade = requestAnimationFrame(step);
       else if (done) done();
@@ -35,53 +39,52 @@
     audio.__fade = requestAnimationFrame(step);
   }
 
-  /* ── 0. Arranque: la première empieza cuando las tipografías están (máx. 1.2 s) ── */
-  const ready = () => document.body.classList.add('is-ready');
-  if (document.fonts && document.fonts.ready) {
-    Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 1200))]).then(ready);
-  } else {
-    setTimeout(ready, 200);
-  }
-
-  /* ── 1. Personalización por enlace: ?invitado=Nombre&n=12 ── */
+  /* ── 0. Personalización por enlace: ?invitado=Nombre&n=12 ── */
   const params = new URLSearchParams(window.location.search);
   const guestName = (params.get('invitado') || params.get('para') || '').trim().slice(0, 60);
   const guestNumber = (params.get('n') || '').trim().replace(/\D/g, '').slice(0, 4);
-  const guestEl = $('#invitado');
-  const reservadoK = $('#reservado-k');
-  if (guestName && guestEl) {
-    guestEl.textContent = guestName;
-    guestEl.classList.add('is-personal');
-    document.title = `Inés & Marcel — ${guestName}`;
-  }
-  if (guestNumber && reservadoK) {
-    reservadoK.textContent = `Invitación N.º ${guestNumber.padStart(3, '0')} · Reservado para`;
-  }
+  const numberLabel = guestNumber ? `Invitación N.º ${guestNumber.padStart(3, '0')} · Reservado para` : '';
+  [['#invitado', '#reservado-k'], ['#portada-invitado', '#portada-k']].forEach(([nameSel, labelSel]) => {
+    const nameEl = $(nameSel);
+    const labelEl = $(labelSel);
+    if (guestName && nameEl) {
+      nameEl.textContent = guestName;
+      nameEl.classList.add('is-personal');
+    }
+    if (numberLabel && labelEl) labelEl.textContent = numberLabel;
+  });
+  if (guestName) document.title = `Inés & Marcel — ${guestName}`;
 
-  /* ── 2. Hojas de olivo que caen por la portada ── */
-  const hojas = $('#hojas');
-  if (hojas && !reduceMotion) {
-    for (let i = 0; i < 6; i += 1) {
+  /* ── 1. Hojas de olivo (portada y portada de la première) ── */
+  function sembrarHojas(container, count) {
+    if (!container || reduceMotion) return;
+    for (let i = 0; i < count; i += 1) {
       const hoja = document.createElement('span');
       hoja.className = 'hoja';
-      hoja.style.left = `${8 + Math.random() * 84}%`;
+      hoja.style.left = `${6 + Math.random() * 88}%`;
       hoja.style.width = `${10 + Math.random() * 4}px`;
       hoja.style.setProperty('--dur', `${11 + Math.random() * 7}s`);
-      hoja.style.setProperty('--del', `${i * 2.3}s`);
+      hoja.style.setProperty('--del', `${i * 2.1}s`);
       hoja.style.setProperty('--mec', `${2.2 + Math.random() * 1.2}s`);
       hoja.innerHTML = '<svg viewBox="0 0 14 26" aria-hidden="true"><use href="#hoja"></use></svg>';
-      hojas.appendChild(hoja);
+      container.appendChild(hoja);
     }
   }
+  sembrarHojas($('#hojas'), 6);
+  sembrarHojas($('#portada-hojas'), 7);
 
-  /* ── 3. El trailer: première con sonido, medallón al bajar ── */
+  /* ── 2. Elementos de la première ── */
+  const portada = $('#portada');
+  const abrirButton = $('#abrir');
   const hero = $('#inicio');
+  const vista = $('#hero-vista');
+  const pantalla = $('#pantalla');
+  const pantallaVelo = pantalla ? pantalla.querySelector('.pantalla__velo') : null;
   const arco = $('#arco');
-  const arcoWrap = $('#arco-wrap');
   const trailer = $('#trailer');
-  const velo = arco ? arco.querySelector('.arco__velo') : null;
-  const playButton = $('#play');
   const soundButton = $('#sonido');
+  const soundText = $('#sonido-txt');
+  const tocaButton = $('#toca');
   const medallon = $('#medallon');
   const hueco = $('#medallon-hueco');
   const cancion = $('#cancion');
@@ -89,52 +92,109 @@
   let soundUnlocked = false;
   let trailerStarted = false;
   let docked = false;
+  let opened = false;
+  let armado = false;
 
-  if (trailer && playButton) {
-    playButton.addEventListener('click', () => {
-      trailerStarted = true;
-      arco.classList.add('is-playing');
-      try { trailer.currentTime = 0; } catch (error) { /* sin metadata todavía */ }
-      // Gesto directo sobre la página: el play con sonido está permitido.
-      trailer.muted = false;
-      try { trailer.volume = 1; } catch (error) { /* iOS */ }
-      const attempt = trailer.play();
-      if (attempt && typeof attempt.then === 'function') {
-        attempt.then(() => {
-          soundUnlocked = true;
-          if (soundButton) soundButton.hidden = true;
-        }).catch(() => {
-          // La imagen nunca se arriesga: en silencio y con el botón de sonido.
-          trailer.muted = true;
-          safePlay(trailer);
-          if (soundButton) soundButton.hidden = false;
-        });
-      } else {
-        soundUnlocked = true;
-      }
+  document.documentElement.classList.add('is-locked');
+  document.body.classList.add('is-locked');
+
+  function reflejarSonido() {
+    if (!soundText || !trailer) return;
+    soundText.textContent = trailer.muted ? 'Activar sonido' : 'Sonido';
+  }
+
+  function vigilarArranque() {
+    [1800, 3600].forEach((ms) => {
+      setTimeout(() => {
+        if (tocaButton && trailer) tocaButton.hidden = !trailer.paused;
+      }, ms);
     });
   }
 
-  if (soundButton) {
-    soundButton.addEventListener('click', () => {
-      trailer.muted = false;
-      try { trailer.volume = 1; } catch (error) { /* iOS */ }
-      safePlay(trailer);
+  function arrancarConSonido() {
+    if (!trailer) return;
+    trailerStarted = true;
+    try { trailer.currentTime = 0; } catch (error) { /* sin metadata todavía */ }
+    // Gesto directo en la página: el play con sonido está permitido.
+    trailer.muted = false;
+    try { trailer.volume = 1; } catch (error) { /* iOS */ }
+    const attempt = trailer.play();
+    if (attempt && typeof attempt.then === 'function') {
+      attempt.then(() => { soundUnlocked = true; reflejarSonido(); }).catch(() => {
+        // La imagen nunca se arriesga: en silencio y con el botón de sonido a la vista.
+        trailer.muted = true;
+        safePlay(trailer);
+        reflejarSonido();
+      });
+    } else {
       soundUnlocked = true;
-      soundButton.hidden = true;
+      reflejarSonido();
+    }
+    vigilarArranque();
+  }
+
+  /* ── 3. La portada: el sello abre la invitación ── */
+  function abrir() {
+    if (opened) return;
+    opened = true;
+    document.body.classList.add('is-open');
+    if (portada) portada.classList.add('is-opening');
+    arrancarConSonido();
+    setTimeout(() => {
+      if (portada) portada.hidden = true;
+      document.documentElement.classList.remove('is-locked');
+      document.body.classList.remove('is-locked');
+      window.scrollTo(0, 0);
+      frame();
+    }, reduceMotion ? 50 : 1250);
+  }
+  if (abrirButton) abrirButton.addEventListener('click', abrir);
+  if (!portada) {
+    // Sin portada (no debería pasar): la página queda libre.
+    document.documentElement.classList.remove('is-locked');
+    document.body.classList.remove('is-locked');
+  }
+
+  if (soundButton && trailer) {
+    soundButton.addEventListener('click', () => {
+      trailer.muted = !trailer.muted;
+      if (!trailer.muted) {
+        try { trailer.volume = 1; } catch (error) { /* iOS */ }
+        soundUnlocked = true;
+      }
+      safePlay(trailer);
+      reflejarSonido();
     });
+  }
+
+  if (tocaButton && trailer) {
+    tocaButton.addEventListener('click', () => {
+      trailer.muted = false;
+      const attempt = trailer.play();
+      if (attempt && typeof attempt.catch === 'function') {
+        attempt.catch(() => { trailer.muted = true; safePlay(trailer); });
+      }
+      soundUnlocked = true;
+      tocaButton.hidden = true;
+      reflejarSonido();
+    });
+    trailer.addEventListener('playing', () => { tocaButton.hidden = true; });
   }
 
   // Vigilante: los navegadores pausan por su cuenta un vídeo mudo "no visible".
   if (trailer) {
+    let fallos = 0;
     setInterval(() => {
       if (document.hidden || trailer.ended) return;
-      if (!trailer.paused) return;
+      if (!trailer.paused) { fallos = 0; return; }
+      fallos += 1;
       if (!soundUnlocked) trailer.muted = true;
       safePlay(trailer);
+      if (fallos >= 3 && opened && tocaButton) tocaButton.hidden = false;
     }, 1000);
   }
 
+  /* ── 4. El medallón: el trailer se acopla cuando la première queda atrás ── */
   function dock() {
     if (docked || !trailer || !medallon || !hueco) return;
     docked = true;
@@ -144,7 +204,6 @@
     trailer.muted = true;
     hueco.appendChild(trailer);
     safePlay(trailer);
-    // La canción entra cuando el invitado ya dio el gesto del trailer.
     if (trailerStarted && cancion) {
       try { cancion.volume = 0; } catch (error) { /* iOS */ }
       safePlay(cancion);
@@ -153,28 +212,16 @@
   }
 
   function undock() {
-    if (!docked || !trailer || !arco) return;
+    if (!docked || !trailer || !pantalla) return;
     docked = false;
     medallon.classList.remove('is-on');
     medallon.classList.add('is-off');
     setTimeout(() => { if (!docked) medallon.hidden = true; }, 380);
-    arco.insertBefore(trailer, velo);
+    pantalla.insertBefore(trailer, pantallaVelo);
     if (soundUnlocked) trailer.muted = false;
+    reflejarSonido();
     safePlay(trailer);
-    if (cancion && !cancion.paused) {
-      fadeAudio(cancion, 0, 900, () => cancion.pause());
-    }
-  }
-
-  if (hero) {
-    const heroObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        hero.classList.toggle('is-visible', entry.isIntersecting);
-        if (entry.intersectionRatio < 0.12) dock();
-        else if (entry.intersectionRatio > 0.35) undock();
-      });
-    }, { threshold: [0, 0.12, 0.35, 0.6] });
-    heroObserver.observe(hero);
+    if (cancion && !cancion.paused) fadeAudio(cancion, 0, 900, () => cancion.pause());
   }
 
   if (medallon) {
@@ -183,22 +230,49 @@
     });
   }
 
-  // Al bajar, el arco se encoge y se aleja antes de acoplarse (rAF acotado).
-  if (arcoWrap && hero && !reduceMotion) {
-    let ticking = false;
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        ticking = false;
-        const limit = Math.max(1, hero.offsetHeight * 0.55);
-        const t = Math.min(1, Math.max(0, window.scrollY / limit));
-        arcoWrap.style.transform = `scale(${1 - t * 0.12}) translateY(${(-20 * t).toFixed(1)}px)`;
-        arcoWrap.style.opacity = String(1 - t * 0.35);
-      });
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
+  /* ── 5. La coreografía del scroll: pantalla completa → arco → medallón ── */
+  let ticking = false;
+  function frame() {
+    ticking = false;
+    if (!hero || !vista || !pantalla || !arco) return;
+    const vh = vista.clientHeight || window.innerHeight;
+    const track = Math.max(1, hero.offsetHeight - vh);
+    const t = clamp01(window.scrollY / track);
+    const e = reduceMotion ? (t > 0.5 ? 1 : 0) : easeInOut(t);
+
+    // El recorte cierra desde la pantalla completa hasta el rectángulo exacto del arco.
+    const a = arco.getBoundingClientRect();
+    const v = vista.getBoundingClientRect();
+    const top = a.top - v.top;
+    const left = a.left - v.left;
+    const right = v.width - (left + a.width);
+    const bottom = v.height - (top + a.height);
+    pantalla.style.clipPath = `inset(${(top * e).toFixed(1)}px ${(right * e).toFixed(1)}px ${(bottom * e).toFixed(1)}px ${(left * e).toFixed(1)}px round ${(140 * e).toFixed(1)}px ${(140 * e).toFixed(1)}px ${(16 * e).toFixed(1)}px ${(16 * e).toFixed(1)}px)`;
+
+    // Lo que rodea al arco aparece en la segunda mitad del recorrido.
+    hero.style.setProperty('--tc', clamp01((t - 0.45) / 0.55).toFixed(3));
+    pantalla.classList.toggle('is-en-arco', t > 0.97);
+    if (t > 0.85 && !armado) {
+      armado = true;
+      hero.classList.add('is-armado');
+    }
+
+    // Más allá de la première, el trailer se acopla como medallón.
+    const heroBottom = hero.getBoundingClientRect().bottom;
+    if (heroBottom < 60) dock();
+    else if (heroBottom > vh * 0.45) undock();
+
+    hero.classList.toggle('is-visible', heroBottom > 0);
   }
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(frame);
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  window.addEventListener('load', frame);
+  frame();
 
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
@@ -209,7 +283,7 @@
     }
   });
 
-  /* ── 4. Revelados: cada sección entra una vez, sus hijos .r escalonados ── */
+  /* ── 6. Revelados: cada sección entra una vez, sus hijos .r escalonados ── */
   const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (!entry.isIntersecting) return;
@@ -219,7 +293,7 @@
   }, { rootMargin: '0px 0px -6% 0px', threshold: 0.06 });
   $$('.reveal').forEach((el) => revealObserver.observe(el));
 
-  /* ── 5. Mini-film del lugar: solo se mueve cuando se ve ── */
+  /* ── 7. Mini-film del lugar: solo se mueve cuando se ve ── */
   const minifilm = $('#minifilm');
   if (minifilm) {
     new IntersectionObserver((entries) => {
@@ -227,7 +301,7 @@
     }, { threshold: 0.2 }).observe(minifilm);
   }
 
-  /* ── 6. El precio se cuenta hacia arriba al llegar al menú ── */
+  /* ── 8. El precio se cuenta hacia arriba al llegar al menú ── */
   const monto = $('#monto');
   const menuSection = $('#menu');
   const formatColones = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
@@ -241,7 +315,7 @@
         const duration = 1400;
         monto.textContent = '0';
         const step = (now) => {
-          const k = Math.min(1, (now - start) / duration);
+          const k = clamp01((now - start) / duration);
           const eased = 1 - Math.pow(1 - k, 3);
           monto.textContent = formatColones(40000 * eased);
           if (k < 1) requestAnimationFrame(step);
@@ -252,7 +326,7 @@
     }, { threshold: 0.3 }).observe(menuSection);
   }
 
-  /* ── 7. Sinpe: un toque copia el número ── */
+  /* ── 9. Sinpe: un toque copia el número ── */
   const sinpeButton = $('#copiar-sinpe');
   const sinpeOk = $('#sinpe-ok');
   if (sinpeButton) {
@@ -269,7 +343,7 @@
     });
   }
 
-  /* ── 8. El carrete: se desliza solo cuando nadie lo toca; un toque lleva el trailer a ese segundo ── */
+  /* ── 10. El carrete: se desliza solo; un toque lleva el trailer a ese segundo ── */
   const carrete = $('#carrete');
   const pista = $('#pista');
   if (carrete && pista) {
@@ -313,17 +387,16 @@
       requestAnimationFrame(glide);
     }
 
-    $$('.fotograma[data-tc]', pista).forEach((frame) => {
-      frame.addEventListener('click', () => {
-        const tc = Number(frame.dataset.tc);
+    $$('.fotograma[data-tc]', pista).forEach((frameEl) => {
+      frameEl.addEventListener('click', () => {
+        const tc = Number(frameEl.dataset.tc);
         if (!Number.isFinite(tc) || !trailer) return;
         trailerStarted = true;
-        if (arco) arco.classList.add('is-playing');
         window.scrollTo({ top: 0, behavior: reduceMotion ? 'instant' : 'smooth' });
-        // Cuando el arco vuelve a estar en pantalla, el trailer salta a ese segundo.
         setTimeout(() => {
           try { trailer.currentTime = tc; } catch (error) { /* sin metadata */ }
           if (soundUnlocked) trailer.muted = false;
+          reflejarSonido();
           safePlay(trailer);
         }, docked ? 700 : 80);
       });

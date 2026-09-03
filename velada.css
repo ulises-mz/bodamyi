@@ -84,54 +84,84 @@ a { color: var(--salvia); text-decoration: none; }
 .sello { width: 64px; height: 64px; }
 
 /* ============================================================
-   01 · LA PREMIÈRE
+   00 · LA PORTADA · el sobre personalizado que se abre con el sello
    ============================================================ */
-.hero {
-  position: relative;
-  min-height: 100svh;
-  min-height: 100vh;
-  padding: 58px 24px 34px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 18px;
+html.is-locked, body.is-locked { overflow: hidden; height: 100%; }
+.portada {
+  position: fixed; inset: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: center;
+  padding: 28px 24px 64px;
+  background-color: var(--lino);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath d='M0 14L14 0M14 28L28 14M0 14L14 28M14 0L28 14' stroke='%234a3a2b' stroke-opacity='0.065' stroke-width='0.7' fill='none'/%3E%3C/svg%3E"),
+    repeating-linear-gradient(0deg, rgba(74,58,43,0.04) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(74,58,43,0.03) 0 1px, transparent 1px 3px);
   overflow: hidden;
+  transition: opacity 0.9s ease 0.45s;
+}
+.portada.is-opening { opacity: 0; pointer-events: none; }
+.portada .hojas { position: absolute; inset: 0; }
+.sobre { position: relative; width: 100%; max-width: 360px; display: flex; flex-direction: column; transition: transform 1s var(--suave), opacity 0.7s ease 0.15s; }
+.portada.is-opening .sobre { transform: translateY(-70px) scale(1.04); opacity: 0; }
+.sobre__tarjeta { padding: 34px 24px 98px; gap: 14px; }
+.sobre__nombres { margin: 0; font-size: clamp(2.2rem, 11vw, 2.7rem); line-height: 1; font-style: italic; text-align: center; }
+.sobre__fecha { margin: 0; font-size: 9px; color: var(--mute); text-align: center; }
+.sobre__invitado { margin: 0; font-size: 36px; line-height: 1.1; text-align: center; color: var(--choco); }
+.sobre__liston {
+  position: absolute; left: -16px; bottom: 40px;
+  width: 62%; height: 36px; padding-right: 30px;
+  background: var(--tarjeta); color: var(--choco);
+  font-size: 22px; line-height: 36px; text-align: center;
+  clip-path: polygon(0 0, 100% 0, 95% 50%, 100% 100%, 0 100%, 5% 50%);
+  box-shadow: 0 10px 22px rgba(74,58,43,0.35), inset 0 0 0 1px rgba(74,58,43,0.25);
+  transform: rotate(-5deg);
+  transition: transform 0.8s var(--suave), opacity 0.6s ease;
+}
+.portada.is-opening .sobre__liston { transform: translate(90px, 20px) rotate(-16deg); opacity: 0; }
+.sobre__sello { position: absolute; left: 50%; bottom: 6px; width: 78px; height: 78px; margin-left: -39px; transform-origin: 50% 50%; }
+.sobre__sello svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 10px 18px rgba(74,58,43,0.35)); }
+.sobre__sello:active svg { transform: scale(0.94); }
+.sobre__halo { position: absolute; inset: -8px; border-radius: 50%; border: 1px solid rgba(74,58,43,0.5); animation: pulso 2.2s ease-out infinite; pointer-events: none; }
+.portada.is-opening .sobre__sello { animation: romper 0.7s var(--suave) forwards; }
+.sobre__pista { position: absolute; left: 0; right: 0; bottom: -36px; margin: 0; text-align: center; font-size: 9px; color: var(--mute-claro); }
+
+/* ============================================================
+   01 · LA PREMIÈRE · el trailer a pantalla completa que se recoge en el arco
+   ============================================================ */
+.hero { position: relative; height: calc(100vh + 70vh); height: calc(100svh + 70svh); }
+.hero__vista {
+  position: sticky; top: 0;
+  height: 100vh; height: 100svh;
+  overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
+  padding: 58px 24px 34px;
 }
 .hero__marca {
-  position: absolute;
-  left: 50%;
-  top: 96px;
-  transform: translateX(-50%);
-  font-size: 300px;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  color: var(--choco);
-  opacity: 0.045;
-  pointer-events: none;
-  white-space: nowrap;
-  user-select: none;
+  position: absolute; left: 50%; top: 96px; transform: translateX(-50%);
+  font-size: 300px; line-height: 1; letter-spacing: -0.02em;
+  color: var(--choco); opacity: 0.045;
+  pointer-events: none; white-space: nowrap; user-select: none;
 }
 .hero__filete { position: absolute; pointer-events: none; }
 .hero__filete--ext { inset: 14px; border: 1px solid rgba(74,58,43,0.55); }
 .hero__filete--int { inset: 19px; border: 1px solid rgba(74,58,43,0.25); }
-
-.hero__lema { display: flex; align-items: center; gap: 12px; margin: 0; color: var(--mute); position: relative; }
+.hero__lema { display: flex; align-items: center; gap: 12px; margin: 0; color: var(--mute); }
 
 /* Hojas de olivo que caen despacio (las crea velada.js) */
 .hojas { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-.hoja {
-  position: absolute;
-  top: -30px;
-  width: 12px;
-  height: 22px;
-  opacity: 0;
-  will-change: transform, opacity;
-  animation: caer var(--dur, 14s) linear var(--del, 0s) infinite;
-}
+.hoja { position: absolute; top: -30px; width: 12px; height: 22px; opacity: 0; will-change: transform, opacity; animation: caer var(--dur, 14s) linear var(--del, 0s) infinite; }
 .hoja svg { display: block; width: 100%; height: 100%; fill: rgba(91,106,84,0.45); stroke: var(--salvia); stroke-width: 0.8; animation: mecer var(--mec, 2.6s) ease-in-out infinite alternate; }
 .hero:not(.is-visible) .hoja, .hero:not(.is-visible) .hoja svg { animation-play-state: paused; }
 
-/* El arco */
+/* Lo que rodea al arco aparece a medida que el trailer se recoge (--tc lo pone velada.js) */
+.hero__contenido {
+  position: relative; z-index: 1;
+  width: 100%; flex-grow: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
+  opacity: var(--tc, 0);
+  transform: translateY(calc((1 - var(--tc, 0)) * 18px));
+  will-change: opacity, transform;
+}
 .arco-wrap { position: relative; width: 280px; height: 420px; margin-top: 6px; }
 .rama { position: absolute; top: 34px; width: 120px; height: 60px; fill: rgba(91,106,84,0.2); stroke: var(--salvia); stroke-width: 1.1; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
 .rama--izq { left: -58px; }
@@ -139,97 +169,53 @@ a { color: var(--salvia); text-decoration: none; }
 .rama .tallo { stroke-dasharray: 140; stroke-dashoffset: 140; }
 .rama .brotes { opacity: 0; }
 .rama .brotes circle { fill: var(--salvia); }
-
 .arco__filete { position: absolute; inset: -9px; border-radius: 149px 149px 22px 22px; border: 1px solid rgba(74,58,43,0.45); pointer-events: none; }
-.arco {
-  position: absolute;
-  inset: 0;
-  border-radius: 140px 140px 16px 16px;
-  overflow: hidden;
-  background: #d9d1c1;
-  box-shadow: 0 0 0 1px rgba(74,58,43,0.7), 0 26px 50px rgba(74,58,43,0.22);
-  clip-path: inset(0 0 100% 0 round 140px 140px 16px 16px);
-  transform-origin: 50% 40%;
-}
-.arco__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.arco__velo { position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 40%, rgba(74,58,43,0) 45%, rgba(74,58,43,0.45) 100%); pointer-events: none; transition: opacity 0.6s ease; }
-.arco__play {
-  position: absolute;
-  left: 50%; top: 50%;
-  width: 64px; height: 64px;
-  margin: -32px 0 0 -32px;
-  border-radius: 999px;
-  background: rgba(248,243,233,0.95);
-  color: var(--choco);
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 10px 26px rgba(0,0,0,0.3);
-  transition: transform 0.3s var(--suave), opacity 0.4s ease;
-}
-.arco__play svg { width: 16px; height: 16px; margin-left: 2px; }
-.arco__play::after {
-  content: '';
-  position: absolute; inset: -6px;
-  border-radius: inherit;
-  border: 1px solid rgba(248,243,233,0.7);
-  animation: pulso 2.2s ease-out infinite;
-}
-.arco__play:active { transform: scale(0.94); }
-.arco.is-playing .arco__play { opacity: 0; pointer-events: none; transform: scale(0.8); }
-.arco.is-playing .arco__velo { opacity: 0.55; }
-.arco__dur { position: absolute; left: 0; right: 0; bottom: 60px; text-align: center; font-size: 9px; color: rgba(248,243,233,0.85); transition: opacity 0.4s ease; }
-.arco.is-playing .arco__dur { opacity: 0; }
-.arco__sonido {
-  position: absolute; left: 50%; bottom: 58px; transform: translateX(-50%);
-  padding: 10px 16px; border-radius: 999px;
-  background: rgba(248,243,233,0.92); color: var(--choco);
-  font-size: 9px;
-}
-
+.arco { position: absolute; inset: 0; border-radius: 140px 140px 16px 16px; background: #d9d1c1; box-shadow: 0 0 0 1px rgba(74,58,43,0.7), 0 26px 50px rgba(74,58,43,0.22); }
 .liston {
-  position: absolute;
-  left: -22px; bottom: 2px;
-  width: 212px; height: 36px;
-  padding-right: 40px;
-  background: var(--tarjeta);
-  color: var(--choco);
+  position: absolute; left: -22px; bottom: 2px;
+  width: 212px; height: 36px; padding-right: 40px;
+  background: var(--tarjeta); color: var(--choco);
   font-size: 22px; line-height: 36px; text-align: center;
   clip-path: polygon(0 0, 100% 0, 95% 50%, 100% 100%, 0 100%, 5% 50%);
   box-shadow: 0 10px 22px rgba(74,58,43,0.35), inset 0 0 0 1px rgba(74,58,43,0.25);
-  opacity: 0;
-  transform: rotate(-16deg) translateY(-14px);
+  opacity: 0; transform: rotate(-16deg) translateY(-14px);
 }
 .sello--hero { position: absolute; left: 132px; bottom: -14px; opacity: 0; transform: scale(1.6); }
-
-.hero__nombres {
-  margin: 26px 0 0;
-  font-size: clamp(2.8rem, 13.5vw, 3.5rem);
-  line-height: 1;
-  font-style: italic;
-  text-align: center;
-  position: relative;
-}
+.hero__nombres { margin: 26px 0 0; font-size: clamp(2.8rem, 13.5vw, 3.5rem); line-height: 1; font-style: italic; text-align: center; }
 .hero__amp { font-style: normal; color: var(--salvia); font-size: 0.8em; }
-.hero__fecha { display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; }
+.hero__fecha { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .hero__romana { display: flex; align-items: center; gap: 12px; margin: 0; font-size: 12px; letter-spacing: 0.36em; }
 .hero__romana i { width: 26px; height: 1px; background: var(--choco); }
 .hero__dia { margin: 0; font-size: 9px; color: var(--mute); }
-.hero__desliza {
-  margin-top: auto;
-  padding-top: 24px;
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-  font-size: 9px; color: var(--mute-claro);
-  position: relative;
-}
+.hero__desliza { margin-top: auto; padding-top: 24px; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 9px; color: var(--mute-claro); }
 .hero__desliza svg { width: 14px; height: 14px; animation: flotar 1.8s ease-in-out infinite; }
 
-/* Arranque de la première (velada.js pone body.is-ready) */
-.anim { opacity: 0; transform: translateY(18px); }
-body.is-ready .anim { animation: subir 1.1s var(--suave) var(--d, 0s) forwards; }
-body.is-ready .arco { animation: telon 1.9s var(--suave) forwards; }
-body.is-ready .liston { animation: liston 1.2s var(--suave) 1.25s forwards; }
-body.is-ready .sello--hero { animation: sellar 0.7s var(--rebote) 2.1s forwards; }
-body.is-ready .rama .tallo { animation: trazo 2.4s ease-out 0.4s forwards; }
-body.is-ready .rama .brotes { animation: aparecer 1.4s ease-out 1.6s forwards; }
+/* Cuando el trailer ya encajó en el arco, el marco cobra vida */
+.hero.is-armado .liston { animation: liston 1.2s var(--suave) 0.2s forwards; }
+.hero.is-armado .sello--hero { animation: sellar 0.7s var(--rebote) 1s forwards; }
+.hero.is-armado .rama .tallo { animation: trazo 2.4s ease-out forwards; }
+.hero.is-armado .rama .brotes { animation: aparecer 1.4s ease-out 1.2s forwards; }
+
+/* La pantalla: el trailer, recortado por velada.js desde el borde hasta el arco */
+.pantalla { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: #1b1511; will-change: clip-path; }
+.pantalla__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.06); transition: transform 1.8s var(--suave); }
+body.is-open .pantalla__video { transform: none; }
+.pantalla__velo { position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 40%, rgba(74,58,43,0) 45%, rgba(74,58,43,0.45) 100%); pointer-events: none; }
+.pantalla__marca { position: absolute; left: 24px; top: 26px; margin: 0; font-size: 9px; color: rgba(248,243,233,0.85); transition: opacity 0.4s ease; }
+.pantalla__sonido {
+  position: absolute; right: 20px; top: 18px;
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; border-radius: 999px;
+  background: rgba(248,243,233,0.92); color: var(--choco);
+  min-height: 40px;
+  transition: opacity 0.4s ease;
+}
+.pantalla__sonido svg { width: 16px; height: 16px; }
+.pantalla__sonido .caps { font-size: 9px; }
+.pantalla__toca { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 15px 22px; border-radius: 999px; background: rgba(248,243,233,0.94); color: var(--choco); font-size: 10px; box-shadow: 0 10px 26px rgba(0,0,0,0.3); }
+.pantalla__desliza { position: absolute; left: 0; right: 0; bottom: 34px; margin: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 9px; color: rgba(248,243,233,0.8); transition: opacity 0.4s ease; }
+.pantalla__desliza svg { width: 14px; height: 14px; animation: flotar 1.8s ease-in-out infinite; }
+.pantalla.is-en-arco .pantalla__marca, .pantalla.is-en-arco .pantalla__sonido, .pantalla.is-en-arco .pantalla__desliza { opacity: 0; pointer-events: none; }
 
 /* El medallón: el trailer acoplado mientras se lee */
 .medallon {
@@ -555,6 +541,7 @@ body.is-ready .rama .brotes { animation: aparecer 1.4s ease-out 1.6s forwards; }
 @keyframes telon { to { clip-path: inset(0 0 0 0 round 140px 140px 16px 16px); } }
 @keyframes liston { from { opacity: 0; transform: rotate(-16deg) translateY(-14px); } to { opacity: 1; transform: rotate(-7deg) translateY(0); } }
 @keyframes sellar { from { opacity: 0; transform: scale(1.6); } to { opacity: 1; transform: scale(1); } }
+@keyframes romper { 0% { transform: scale(1) rotate(0); opacity: 1; } 45% { transform: scale(1.22) rotate(-8deg); opacity: 1; } 100% { transform: scale(0.35) rotate(22deg); opacity: 0; } }
 @keyframes desellar { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.4); } }
 @keyframes trazo { to { stroke-dashoffset: 0; } }
 @keyframes trazar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
@@ -598,8 +585,9 @@ body.is-ready .rama .brotes { animation: aparecer 1.4s ease-out 1.6s forwards; }
 
 /* Menos movimiento si el sistema lo pide */
 @media (prefers-reduced-motion: reduce) {
-  .anim, .liston, .sello--hero, .rama .brotes { opacity: 1; transform: none; animation: none !important; }
-  .arco { animation: none !important; clip-path: none; }
+  .liston, .sello--hero, .rama .brotes { opacity: 1; transform: none; animation: none !important; }
+  .portada, .sobre, .sobre__liston { transition: none; }
+  .sobre__halo, .pantalla__desliza svg { animation: none; }
   .rama .tallo { animation: none !important; stroke-dashoffset: 0; }
   .hoja { display: none; }
   .reveal .r { opacity: 1; transform: none; transition: none; }
@@ -609,12 +597,11 @@ body.is-ready .rama .brotes { animation: aparecer 1.4s ease-out 1.6s forwards; }
   .minifilm__escena--1 { opacity: 1; animation: none; }
   .minifilm__escena--2, .minifilm__rotulo--2, .minifilm__grano { display: none; }
   .minifilm__rotulo--1 { opacity: 1; animation: none; }
-  .arco__play::after, .hero__desliza svg { animation: none; }
+  .hero__desliza svg { animation: none; }
 }
 
 /* Escritorio: la columna centrada respira sobre el lino */
 @media (min-width: 700px) {
   .pagina { box-shadow: 0 0 0 1px rgba(74,58,43,0.12), 0 40px 90px rgba(74,58,43,0.12); margin: 32px auto; }
-  .hero { min-height: 860px; }
   .medallon { right: calc(50% - 220px - 82px); }
 }
