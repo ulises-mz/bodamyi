@@ -91,6 +91,8 @@
   const hueco = $('#medallon-hueco');
   const cancion = $('#cancion');
 
+  const silencio = $('#silencio');
+  let mudo = false;
   let soundUnlocked = false;
   let trailerStarted = false;
   let docked = false;
@@ -99,6 +101,24 @@
 
   document.documentElement.classList.add('is-locked');
   document.body.classList.add('is-locked');
+
+  function aplicarSilencio() {
+    if (cancion) cancion.muted = mudo;
+    if (trailer) trailer.muted = docked ? true : (mudo || !soundUnlocked);
+    if (silencio) {
+      silencio.classList.toggle('is-mudo', mudo);
+      silencio.setAttribute('aria-label', mudo ? 'Activar sonido' : 'Silenciar');
+    }
+    reflejarSonido();
+  }
+  if (silencio) {
+    silencio.addEventListener('click', () => {
+      mudo = !mudo;
+      if (!mudo) soundUnlocked = true;
+      aplicarSilencio();
+      if (!mudo && docked && cancion && cancion.paused && trailerStarted) safePlay(cancion);
+    });
+  }
 
   function reflejarSonido() {
     if (!soundText || !trailer) return;
@@ -161,8 +181,21 @@
     if (portada) portada.classList.add('is-opening');
     arrancarConSonido();
     if (ambiente && esEscritorio.matches) { ambiente.preload = 'auto'; safePlay(ambiente); }
+    // iOS solo deja reproducir fuera de un toque a los elementos que ya
+    // sonaron dentro de uno: la cancion arranca aqui y se detiene al instante.
+    if (cancion) {
+      cancion.preload = 'auto';
+      const primer = cancion.play();
+      if (primer && typeof primer.then === 'function') {
+        primer.then(() => {
+          cancion.pause();
+          try { cancion.currentTime = 0; } catch (error) { /* sin metadata */ }
+        }).catch(() => {});
+      }
+    }
     setTimeout(() => {
       if (portada) portada.hidden = true;
+      if (silencio) silencio.hidden = false;
       document.documentElement.classList.remove('is-locked');
       document.body.classList.remove('is-locked');
       window.scrollTo(0, 0);
@@ -182,6 +215,9 @@
       if (!trailer.muted) {
         try { trailer.volume = 1; } catch (error) { /* iOS */ }
         soundUnlocked = true;
+        mudo = false;
+        if (silencio) { silencio.classList.remove('is-mudo'); silencio.setAttribute('aria-label', 'Silenciar'); }
+        if (cancion) cancion.muted = false;
       }
       safePlay(trailer);
       reflejarSonido();
@@ -209,7 +245,7 @@
       if (document.hidden || trailer.ended) return;
       if (!trailer.paused) { fallos = 0; return; }
       fallos += 1;
-      if (!soundUnlocked) trailer.muted = true;
+      if (!soundUnlocked || mudo) trailer.muted = true;
       safePlay(trailer);
       if (fallos >= 3 && opened && tocaButton) tocaButton.hidden = false;
     }, 1000);
@@ -226,9 +262,18 @@
     hueco.appendChild(trailer);
     safePlay(trailer);
     if (trailerStarted && cancion) {
+      cancion.muted = mudo;
       try { cancion.volume = 0; } catch (error) { /* iOS */ }
       safePlay(cancion);
       fadeAudio(cancion, 0.85, 1600);
+      // Si el navegador la rechaza, se reintenta al primer toque siguiente.
+      setTimeout(() => {
+        if (cancion.paused && docked && !mudo) {
+          const reintentar = () => { if (docked && !mudo) safePlay(cancion); };
+          document.addEventListener('pointerdown', reintentar, { once: true, passive: true });
+          document.addEventListener('touchstart', reintentar, { once: true, passive: true });
+        }
+      }, 800);
     }
   }
 
@@ -239,7 +284,7 @@
     medallon.classList.add('is-off');
     setTimeout(() => { if (!docked) medallon.hidden = true; }, 380);
     pantalla.insertBefore(trailer, pantallaVelo);
-    if (soundUnlocked) trailer.muted = false;
+    trailer.muted = mudo || !soundUnlocked;
     reflejarSonido();
     safePlay(trailer);
     if (cancion && !cancion.paused) fadeAudio(cancion, 0, 900, () => cancion.pause());
@@ -301,7 +346,7 @@
       if (cancion && !cancion.paused) cancion.pause();
     } else {
       safePlay(trailer);
-      if (docked && trailerStarted && cancion) safePlay(cancion);
+      if (docked && trailerStarted && cancion && !mudo) safePlay(cancion);
     }
   });
 

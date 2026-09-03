@@ -241,8 +241,8 @@ html.is-locked, body.is-locked { overflow: hidden; height: 100%; }
 .portada__barra--arriba { top: 0; transform-origin: 50% 0; }
 .portada__barra--abajo { bottom: 0; transform-origin: 50% 100%; }
 .portada.is-opening .portada__barra { transform: scaleY(1); }
-.portada .hojas { transition: filter 0.9s ease, opacity 0.9s ease; }
-.portada.is-opening .hojas { filter: blur(2px); opacity: 0.55; }
+.portada .hojas { transition: opacity 0.9s ease; }
+.portada.is-opening .hojas { opacity: 0.45; }
 .portada .camara, .portada .sobre__pista { position: relative; z-index: 1; }
 
 /* ============================================================
@@ -355,6 +355,23 @@ body.is-open .pantalla__video { transform: none; }
 .medallon__hueco video { width: 100%; height: 100%; object-fit: cover; }
 .medallon__anillo { position: absolute; inset: -4px; border-radius: 50%; border: 1px solid rgba(74,58,43,0.6); pointer-events: none; }
 .medallon__anillo::after { content: ''; position: absolute; inset: 3px; border-radius: 50%; border: 1px solid rgba(248,243,233,0.9); }
+
+/* Silencio global: una pastilla de cera abajo a la derecha */
+.silencio {
+  position: fixed; right: 16px; bottom: 18px; z-index: 60;
+  width: 46px; height: 46px; border-radius: 50%;
+  background: var(--choco); color: var(--lino);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 10px 24px rgba(74,58,43,0.35), inset 0 0 0 1px rgba(244,238,227,0.25);
+  transition: transform 0.25s var(--suave), opacity 0.4s ease;
+}
+.silencio:active { transform: scale(0.94); }
+.silencio svg { width: 20px; height: 20px; }
+.silencio .silencio__off { display: none; }
+.silencio.is-mudo .silencio__on { display: none; }
+.silencio.is-mudo .silencio__off { display: block; }
+.silencio.is-mudo { background: var(--lino); color: var(--choco); box-shadow: 0 10px 24px rgba(74,58,43,0.25), inset 0 0 0 1px rgba(74,58,43,0.5); }
+@media (min-width: 900px) { .silencio { right: 24px; bottom: 24px; width: 52px; height: 52px; } }
 
 /* ============================================================
    SECCIONES · fondo, tarjetas, encaje, revelado
@@ -732,19 +749,18 @@ body.is-open .pantalla__video { transform: none; }
    fundidos en los bordes con una máscara radial. Siempre detrás del
    contenido (z-index -1 dentro de cada sección aislada).
    ============================================================ */
-.seccion, .firma, .hero__vista, .portada { isolation: isolate; }
+.seccion, .firma, .portada { isolation: isolate; }
 .seccion--con-flor, .firma { overflow: hidden; }
 .flor {
   position: absolute; z-index: -1; pointer-events: none;
+  transform: translateZ(0); backface-visibility: hidden;
   opacity: var(--op, 0.42);
-  -webkit-mask-image: radial-gradient(ellipse 62% 62% at 50% 50%, #000 30%, transparent 72%);
-  mask-image: radial-gradient(ellipse 62% 62% at 50% 50%, #000 30%, transparent 72%);
 }
-.flor img { display: block; width: 100%; height: auto; filter: sepia(0.35) saturate(0.6) brightness(1.02) contrast(0.92) url(#grano-flor); }
+.flor img { display: block; width: 100%; height: auto; }
 .flor--portada-tl { width: 360px; left: -150px; top: -60px; transform: rotate(-18deg); --op: 0.38; }
 .flor--portada-br { width: 380px; right: -160px; bottom: -70px; transform: rotate(160deg); --op: 0.38; }
-.portada .flor { transition: filter 0.9s ease, opacity 0.9s ease; }
-.portada.is-opening .flor { filter: blur(2px); opacity: 0.2; }
+.portada .flor { transition: opacity 0.9s ease; }
+.portada.is-opening .flor { opacity: 0.2; }
 .flor--hero-tl { width: 320px; left: -130px; top: -10px; transform: rotate(-22deg); --op: 0.34; }
 .flor--hero-br { width: 340px; right: -140px; bottom: -30px; transform: rotate(158deg); --op: 0.34; }
 .flor--invitacion { width: 300px; right: -120px; top: -40px; transform: rotate(14deg); --op: 0.5; }
