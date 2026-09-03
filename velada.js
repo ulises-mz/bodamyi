@@ -365,49 +365,127 @@
     });
   }
 
-  /* ── 10. El carrete: se desliza solo; un toque lleva el trailer a ese segundo ── */
+  /* ── 10. El carrete: lo mueve el scroll (bajar → izquierda, subir → derecha)
+        y también el dedo, con inercia. Un solo rAF que suaviza y se duerme
+        cuando no hay nada que mover o la sección no está cerca. ── */
   const carrete = $('#carrete');
   const pista = $('#pista');
   if (carrete && pista) {
-    let visible = false;
-    let idle = true;
-    let idleTimer = 0;
-    let programmatic = false;
-    let direction = 1;
+    let maxX = 0;
+    let objetivo = 0;       // a dónde quiere ir
+    let actual = 0;         // dónde está (suavizado)
+    let arrastre = 0;       // lo que el dedo ha sumado sobre la posición del scroll
+    let cerca = false;
+    let corriendo = false;
+    let ultimo = 0;
+    let arrastrando = false;
+    let x0 = 0;
+    let xPrev = 0;
+    let tPrev = 0;
+    let velocidad = 0;
+    let movido = 0;
+    let arrastreInicial = 0;
 
-    const touched = () => {
-      if (programmatic) return;
-      idle = false;
-      clearTimeout(idleTimer);
-      idleTimer = setTimeout(() => { idle = true; }, 5000);
-    };
-    pista.addEventListener('scroll', touched, { passive: true });
-    pista.addEventListener('pointerdown', touched, { passive: true });
-    pista.addEventListener('touchstart', touched, { passive: true });
+    function medir() {
+      maxX = Math.max(0, pista.scrollWidth - carrete.clientWidth);
+    }
+
+    // 0 cuando la sección asoma por abajo, 1 cuando termina de salir por arriba.
+    function porScroll() {
+      const r = carrete.getBoundingClientRect();
+      const vh = window.innerHeight;
+      return clamp01((vh - r.top) / (vh + r.height));
+    }
+
+    function calcularObjetivo() {
+      const base = porScroll() * maxX;
+      objetivo = Math.min(maxX, Math.max(0, base + arrastre));
+      // El arrastre nunca acumula más allá de los bordes: así el scroll
+      // siempre responde de inmediato aunque el dedo haya tirado de más.
+      if (!arrastrando) arrastre = objetivo - base;
+    }
+
+    function paso(now) {
+      const dt = Math.min(64, now - ultimo) || 16;
+      ultimo = now;
+      // Suavizado exponencial, independiente de los fps (constante de 90 ms).
+      actual += (objetivo - actual) * (1 - Math.exp(-dt / 90));
+      pista.style.transform = `translate3d(${(-actual).toFixed(2)}px, 0, 0)`;
+      if (Math.abs(objetivo - actual) > 0.05 || arrastrando) {
+        requestAnimationFrame(paso);
+      } else {
+        actual = objetivo;
+        pista.style.transform = `translate3d(${(-actual).toFixed(2)}px, 0, 0)`;
+        corriendo = false;
+      }
+    }
+
+    function despertar() {
+      calcularObjetivo();
+      if (corriendo) return;
+      corriendo = true;
+      ultimo = performance.now();
+      requestAnimationFrame(paso);
+    }
 
     new IntersectionObserver((entries) => {
-      entries.forEach((entry) => { visible = entry.isIntersecting; });
-    }, { threshold: 0.3 }).observe(carrete);
+      entries.forEach((entry) => {
+        cerca = entry.isIntersecting;
+        if (cerca) { medir(); despertar(); }
+      });
+    }, { rootMargin: '240px 0px' }).observe(carrete);
 
-    if (!reduceMotion) {
-      let last = performance.now();
-      const glide = (now) => {
-        const dt = Math.min(48, now - last);
-        last = now;
-        if (visible && idle && !document.hidden) {
-          const max = pista.scrollWidth - pista.clientWidth;
-          if (max > 0) {
-            programmatic = true;
-            pista.scrollLeft += direction * dt * 0.018;
-            if (pista.scrollLeft >= max - 1) direction = -1;
-            if (pista.scrollLeft <= 1) direction = 1;
-            requestAnimationFrame(() => { programmatic = false; });
-          }
-        }
-        requestAnimationFrame(glide);
-      };
-      requestAnimationFrame(glide);
-    }
+    window.addEventListener('scroll', () => { if (cerca) despertar(); }, { passive: true });
+    window.addEventListener('resize', () => { medir(); despertar(); }, { passive: true });
+    window.addEventListener('load', () => { medir(); despertar(); });
+    medir();
+    despertar();
+
+    // El dedo (o el ratón): arrastre horizontal con inercia; el vertical
+    // sigue siendo scroll de la página (touch-action: pan-y).
+    pista.addEventListener('pointerdown', (event) => {
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
+      arrastrando = true;
+      movido = 0;
+      x0 = event.clientX;
+      xPrev = event.clientX;
+      tPrev = event.timeStamp;
+      velocidad = 0;
+      arrastreInicial = arrastre;
+      try { pista.setPointerCapture(event.pointerId); } catch (error) { /* sin captura */ }
+      pista.classList.add('is-arrastrando');
+      despertar();
+    });
+
+    pista.addEventListener('pointermove', (event) => {
+      if (!arrastrando) return;
+      const dx = event.clientX - xPrev;
+      movido += Math.abs(dx);
+      arrastre = arrastreInicial - (event.clientX - x0);
+      const dt = event.timeStamp - tPrev || 16;
+      velocidad = dx / dt;
+      xPrev = event.clientX;
+      tPrev = event.timeStamp;
+      despertar();
+    });
+
+    const soltar = () => {
+      if (!arrastrando) return;
+      arrastrando = false;
+      pista.classList.remove('is-arrastrando');
+      // La velocidad del dedo se convierte en un empujón que el suavizado frena.
+      arrastre -= velocidad * 260;
+      velocidad = 0;
+      despertar();
+    };
+    pista.addEventListener('pointerup', soltar);
+    pista.addEventListener('pointercancel', soltar);
+    pista.addEventListener('lostpointercapture', soltar);
+
+    // Un arrastre no es un toque: no debe abrir el fotograma.
+    pista.addEventListener('click', (event) => {
+      if (movido > 8) { event.stopPropagation(); event.preventDefault(); }
+    }, true);
 
     $$('.fotograma[data-tc]', pista).forEach((frameEl) => {
       frameEl.addEventListener('click', () => {
