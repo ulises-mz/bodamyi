@@ -135,6 +135,24 @@
     vigilarArranque();
   }
 
+  /* ── 2b. En escritorio, un reflejo desenfocado del trailer llena la pantalla ── */
+  const ambiente = $('#ambiente');
+  const esEscritorio = window.matchMedia('(min-width: 900px)');
+  function sincronizarAmbiente() {
+    if (!ambiente || !trailer || !esEscritorio.matches) return;
+    if (Math.abs(ambiente.currentTime - trailer.currentTime) > 0.5) {
+      try { ambiente.currentTime = trailer.currentTime; } catch (error) { /* buffering */ }
+    }
+    if (trailer.paused) ambiente.pause(); else safePlay(ambiente);
+  }
+  if (ambiente && trailer) {
+    ambiente.muted = true;
+    setInterval(sincronizarAmbiente, 3000);
+    trailer.addEventListener('play', sincronizarAmbiente);
+    trailer.addEventListener('pause', () => ambiente.pause());
+    trailer.addEventListener('seeked', sincronizarAmbiente);
+  }
+
   /* ── 3. La portada: el sello abre la invitación ── */
   function abrir() {
     if (opened) return;
@@ -142,6 +160,7 @@
     document.body.classList.add('is-open');
     if (portada) portada.classList.add('is-opening');
     arrancarConSonido();
+    if (ambiente && esEscritorio.matches) { ambiente.preload = 'auto'; safePlay(ambiente); }
     setTimeout(() => {
       if (portada) portada.hidden = true;
       document.documentElement.classList.remove('is-locked');
@@ -249,7 +268,8 @@
     const left = a.left - v.left;
     const right = v.width - (left + a.width);
     const bottom = v.height - (top + a.height);
-    pantalla.style.clipPath = `inset(${(top * e).toFixed(1)}px ${(right * e).toFixed(1)}px ${(bottom * e).toFixed(1)}px ${(left * e).toFixed(1)}px round ${(140 * e).toFixed(1)}px ${(140 * e).toFixed(1)}px ${(16 * e).toFixed(1)}px ${(16 * e).toFixed(1)}px)`;
+    const rArco = a.width / 2;
+    pantalla.style.clipPath = `inset(${(top * e).toFixed(1)}px ${(right * e).toFixed(1)}px ${(bottom * e).toFixed(1)}px ${(left * e).toFixed(1)}px round ${(rArco * e).toFixed(1)}px ${(rArco * e).toFixed(1)}px ${(16 * e).toFixed(1)}px ${(16 * e).toFixed(1)}px)`;
 
     // Lo que rodea al arco aparece en la segunda mitad del recorrido.
     hero.style.setProperty('--tc', clamp01((t - 0.45) / 0.55).toFixed(3));

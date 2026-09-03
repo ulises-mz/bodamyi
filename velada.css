@@ -274,7 +274,7 @@ html.is-locked, body.is-locked { overflow: hidden; height: 100%; }
   box-shadow: 0 10px 22px rgba(74,58,43,0.35), inset 0 0 0 1px rgba(74,58,43,0.25);
   opacity: 0; transform: rotate(-16deg) translateY(-14px);
 }
-.sello--hero { position: absolute; left: 132px; bottom: -14px; opacity: 0; transform: scale(1.6); }
+.sello--hero { position: absolute; left: calc(50% - 8px); bottom: -14px; opacity: 0; transform: scale(1.6); }
 .hero__nombres { margin: 26px 0 0; font-size: clamp(2.8rem, 13.5vw, 3.5rem); line-height: 1; font-style: italic; text-align: center; }
 .hero__amp { font-style: normal; color: var(--salvia); font-size: 0.8em; }
 .hero__fecha { display: flex; flex-direction: column; align-items: center; gap: 8px; }
@@ -292,6 +292,7 @@ html.is-locked, body.is-locked { overflow: hidden; height: 100%; }
 
 /* La pantalla: el trailer, recortado por velada.js desde el borde hasta el arco */
 .pantalla { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: #1b1511; will-change: clip-path; }
+.pantalla__ambiente { display: none; }
 .pantalla__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.06); transition: transform 1.8s var(--suave); }
 body.is-open .pantalla__video { transform: none; }
 .pantalla__velo { position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 40%, rgba(74,58,43,0) 45%, rgba(74,58,43,0.45) 100%); pointer-events: none; }
@@ -719,6 +720,7 @@ body.is-open .pantalla__video { transform: none; }
 @keyframes brillo { to { transform: translateX(130%); } }
 @keyframes trazo100 { to { stroke-dashoffset: 0; } }
 @keyframes tachar70 { to { stroke-dashoffset: 0; } }
+@keyframes sobreFlotaEscritorio { 0%, 100% { transform: rotateX(8deg) translateY(0) rotate(-1deg); } 50% { transform: rotateX(8deg) translateY(-8px) rotate(-1deg); } }
 @keyframes desellar { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.4); } }
 @keyframes trazo { to { stroke-dashoffset: 0; } }
 @keyframes trazar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
@@ -781,8 +783,57 @@ body.is-open .pantalla__video { transform: none; }
   .hero__desliza svg { animation: none; }
 }
 
-/* Escritorio: la columna centrada respira sobre el lino */
-@media (min-width: 700px) {
-  .pagina { box-shadow: 0 0 0 1px rgba(74,58,43,0.12), 0 40px 90px rgba(74,58,43,0.12); margin: 32px auto; }
-  .medallon { right: calc(50% - 220px - 82px); }
+/* ============================================================
+   ESCRITORIO
+   La carta se abre a escala y con más perspectiva; el hero ocupa toda
+   la ventana y el trailer (vertical) va contenido sobre su propio
+   reflejo desenfocado; el resto sigue en una columna centrada.
+   ============================================================ */
+@media (min-width: 900px) {
+  .pagina { box-shadow: 0 0 0 1px rgba(74,58,43,0.12), 0 40px 90px rgba(74,58,43,0.12); margin: 0 auto 48px; }
+  .medallon { right: 24px; top: 20px; width: 84px; height: 84px; }
+
+  /* La portada */
+  .portada { gap: 0; }
+  .escena { transform: scale(1.45); transform-origin: 50% 50%; margin: 96px 0 118px; perspective: 1400px; }
+  .sobre3d { animation-name: sobreFlotaEscritorio; }
+  .sobre3d::after {
+    content: ''; position: absolute; left: 6%; right: 6%; bottom: -34px; height: 40px;
+    border-radius: 50%; background: radial-gradient(ellipse at center, rgba(74,58,43,0.28), rgba(74,58,43,0) 70%);
+    z-index: 0; pointer-events: none;
+  }
+  .sobre3d__sello { transition: transform 0.35s var(--suave); cursor: pointer; }
+  .sobre3d__sello:hover { transform: translateY(-3px) scale(1.04); }
+  .sobre3d__sello:hover .sobre__halo { animation-duration: 1.4s; }
+  .sobre__pista { font-size: 10px; }
+
+  /* La première */
+  .hero__vista { padding-top: 54px; }
+  .hero__marca { font-size: 420px; top: 60px; }
+  .hero__nombres { font-size: 4.4rem; }
+  .hero__romana { font-size: 13px; }
+  .pantalla { background: #1b1511; }
+  .pantalla__ambiente {
+    display: block; position: absolute; inset: -6%; width: 112%; height: 112%;
+    object-fit: cover; filter: blur(34px) brightness(0.55) saturate(0.9); transform: scale(1.06);
+  }
+  .pantalla__video { object-fit: contain; }
+  .pantalla.is-en-arco .pantalla__video { object-fit: cover; }
+  .pantalla__marca { left: 32px; top: 30px; font-size: 10px; }
+  .pantalla__sonido { right: 28px; top: 24px; }
+}
+
+@media (min-width: 900px) and (min-height: 820px) {
+  .escena { transform: scale(1.6); margin: 128px 0 150px; }
+  .arco-wrap { width: 360px; height: 540px; }
+  .arco, .arco-wrap .arco { border-radius: 180px 180px 18px 18px; }
+  .arco__filete { border-radius: 189px 189px 24px 24px; }
+  .rama { top: 48px; width: 150px; height: 75px; }
+  .rama--izq { left: -74px; }
+  .rama--der { right: -74px; }
+  .liston { width: 250px; left: -26px; font-size: 24px; }
+}
+
+@media (min-width: 1280px) and (min-height: 900px) {
+  .escena { transform: scale(1.8); margin: 172px 0 196px; }
 }
