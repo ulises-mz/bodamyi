@@ -219,6 +219,32 @@ html.is-locked, body.is-locked { overflow: hidden; height: 100%; }
 .portada.is-opening .carta__brillo { animation: brillo 1s ease-in-out 2.9s forwards; }
 .portada.is-opening .sobre3d { animation: none; }
 
+/* La cámara: todo el sobre está dentro de un encuadre que se mueve como
+   una cámara de mano. En reposo, un lentísimo acercamiento y un temblor
+   mínimo. Al tocar el sello: acercamiento rápido a la cera, retroceso
+   mientras se abre la solapa, seguimiento de la carta al salir, encuadre
+   de la carta desplegada, lento acercamiento mientras se lee el nombre
+   y un empujón final a través de la carta hacia el trailer.
+   --foco: cuánto sube la cámara para centrar el sello (depende de la escala). */
+.portada { --foco: -205px; }
+.camara { position: relative; transform-origin: 50% 50%; will-change: transform; animation: camaraReposo 7s ease-in-out infinite alternate; }
+.camara__mano { animation: camaraMano 6.5s ease-in-out infinite; }
+.portada.is-opening .camara { animation: camaraToma 5.9s cubic-bezier(0.45, 0, 0.2, 1) forwards; }
+.portada__vineta { position: absolute; inset: 0; z-index: 2; pointer-events: none; background: radial-gradient(120% 90% at 50% 45%, rgba(74,58,43,0) 55%, rgba(74,58,43,0.32) 100%); }
+.portada__grano {
+  position: absolute; inset: -20%; z-index: 3; pointer-events: none;
+  opacity: 0.11; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.7 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grano 0.9s steps(6) infinite;
+}
+.portada__barra { position: absolute; left: 0; right: 0; height: 7%; z-index: 4; background: #1b1511; transform: scaleY(0); transition: transform 0.9s var(--suave); }
+.portada__barra--arriba { top: 0; transform-origin: 50% 0; }
+.portada__barra--abajo { bottom: 0; transform-origin: 50% 100%; }
+.portada.is-opening .portada__barra { transform: scaleY(1); }
+.portada .hojas { transition: filter 0.9s ease, opacity 0.9s ease; }
+.portada.is-opening .hojas { filter: blur(2px); opacity: 0.55; }
+.portada .camara, .portada .sobre__pista { position: relative; z-index: 1; }
+
 /* ============================================================
    01 · LA PREMIÈRE · el trailer a pantalla completa que se recoge en el arco
    ============================================================ */
@@ -721,6 +747,22 @@ body.is-open .pantalla__video { transform: none; }
 @keyframes trazo100 { to { stroke-dashoffset: 0; } }
 @keyframes tachar70 { to { stroke-dashoffset: 0; } }
 @keyframes sobreFlotaEscritorio { 0%, 100% { transform: rotateX(8deg) translateY(0) rotate(-1deg); } 50% { transform: rotateX(8deg) translateY(-8px) rotate(-1deg); } }
+@keyframes camaraReposo { from { transform: scale(1); } to { transform: scale(1.045) translateY(-4px); } }
+@keyframes camaraMano {
+  0%, 100% { transform: translate(0, 0) rotate(0); }
+  25% { transform: translate(2px, -2px) rotate(0.3deg); }
+  50% { transform: translate(-2px, 1px) rotate(-0.25deg); }
+  75% { transform: translate(1px, 2px) rotate(0.2deg); }
+}
+@keyframes camaraToma {
+  0% { transform: translate(0, 0) scale(1) rotate(0); }
+  12% { transform: translate(0, var(--foco)) scale(1.85) rotate(-1.2deg); }
+  22% { transform: translate(0, calc(var(--foco) * 0.55)) scale(1.35) rotate(-0.4deg); }
+  41% { transform: translate(0, 14px) scale(1.2) rotate(0.3deg); }
+  58% { transform: translate(0, 0) scale(1.1) rotate(0); }
+  83% { transform: translate(0, 0) scale(1.17) rotate(0); }
+  100% { transform: translate(0, -12px) scale(1.6) rotate(0); }
+}
 @keyframes desellar { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.4); } }
 @keyframes trazo { to { stroke-dashoffset: 0; } }
 @keyframes trazar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
@@ -766,6 +808,8 @@ body.is-open .pantalla__video { transform: none; }
 @media (prefers-reduced-motion: reduce) {
   .liston, .sello--hero, .rama .brotes { opacity: 1; transform: none; animation: none !important; }
   .portada.is-opening { animation: none; opacity: 0; }
+  .camara, .camara__mano, .portada__grano { animation: none !important; }
+  .portada__barra { transition: none; }
   .sobre3d, .portada.is-opening .lacre--mitad, .portada.is-opening .sobre3d__liston, .portada.is-opening .sobre3d__solapa, .portada.is-opening .carta, .portada.is-opening .carta__mitad--abajo, .portada.is-opening .carta__brillo { animation: none !important; }
   .figurin__svg .trazo { stroke-dashoffset: 0; animation: none !important; }
   .muestra3 { transform: rotate(var(--ang, 0deg)); transition: none; }
@@ -795,6 +839,7 @@ body.is-open .pantalla__video { transform: none; }
 
   /* La portada */
   .portada { gap: 0; }
+  .portada { --foco: -300px; }
   .escena { transform: scale(1.45); transform-origin: 50% 50%; margin: 96px 0 118px; perspective: 1400px; }
   .sobre3d { animation-name: sobreFlotaEscritorio; }
   .sobre3d::after {
@@ -824,6 +869,7 @@ body.is-open .pantalla__video { transform: none; }
 }
 
 @media (min-width: 900px) and (min-height: 820px) {
+  .portada { --foco: -330px; }
   .escena { transform: scale(1.6); margin: 128px 0 150px; }
   .arco-wrap { width: 360px; height: 540px; }
   .arco, .arco-wrap .arco { border-radius: 180px 180px 18px 18px; }
@@ -835,5 +881,6 @@ body.is-open .pantalla__video { transform: none; }
 }
 
 @media (min-width: 1280px) and (min-height: 900px) {
+  .portada { --foco: -372px; }
   .escena { transform: scale(1.8); margin: 172px 0 196px; }
 }

@@ -17,8 +17,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Jost:wght@300;400;500&family=Pinyon+Script&display=swap" rel="stylesheet">
-  <link rel="preload" as="image" href="savethedate-poster.jpg?v=20260903i">
-  <link rel="stylesheet" href="velada.css?v=20260903i">
+  <link rel="preload" as="image" href="savethedate-poster.jpg?v=20260903j">
+  <link rel="stylesheet" href="velada.css?v=20260903j">
 </head>
 <body>
 
@@ -70,45 +70,53 @@
 <!-- ══════════════ 00 · LA PORTADA · la carta que se abre ══════════════ -->
 <div class="portada" id="portada">
   <div class="hojas" id="portada-hojas" aria-hidden="true"></div>
-  <div class="escena">
-    <div class="sobre3d" id="sobre3d">
-      <div class="sobre3d__dorso sobre3d__pieza" aria-hidden="true"></div>
+  <div class="portada__barra portada__barra--arriba" aria-hidden="true"></div>
+  <div class="portada__barra portada__barra--abajo" aria-hidden="true"></div>
+  <div class="portada__vineta" aria-hidden="true"></div>
+  <div class="portada__grano" aria-hidden="true"></div>
+  <div class="camara" id="camara">
+    <div class="camara__mano">
+      <div class="escena">
+        <div class="sobre3d" id="sobre3d">
+          <div class="sobre3d__dorso sobre3d__pieza" aria-hidden="true"></div>
 
-      <!-- La carta, doblada por la mitad dentro del sobre -->
-      <div class="carta" id="carta">
-        <div class="carta__mitad carta__mitad--arriba">
-          <svg class="escudo escudo--chico" aria-hidden="true"><use href="#escudo"></use></svg>
-          <p class="didone carta__nombres">Inés <span class="hero__amp">&amp;</span> Marcel</p>
-          <p class="caps carta__fecha">27 · 11 · 2026 · Vino Mundo</p>
-          <div class="ornamento ornamento--corto" aria-hidden="true"><span></span><svg class="rombo"><use href="#rombo"></use></svg><span></span></div>
-        </div>
-        <div class="carta__mitad carta__mitad--abajo">
-          <div class="carta__cara carta__cara--frente">
-            <p class="caps reservado__k" id="portada-k">Reservado para</p>
-            <p class="script carta__invitado" id="portada-invitado">un invitado muy especial</p>
-            <p class="caps carta__nota">Tenemos el honor de invitarte</p>
+          <!-- La carta, doblada por la mitad dentro del sobre -->
+          <div class="carta" id="carta">
+            <div class="carta__mitad carta__mitad--arriba">
+              <svg class="escudo escudo--chico" aria-hidden="true"><use href="#escudo"></use></svg>
+              <p class="didone carta__nombres">Inés <span class="hero__amp">&amp;</span> Marcel</p>
+              <p class="caps carta__fecha">27 · 11 · 2026 · Vino Mundo</p>
+              <div class="ornamento ornamento--corto" aria-hidden="true"><span></span><svg class="rombo"><use href="#rombo"></use></svg><span></span></div>
+            </div>
+            <div class="carta__mitad carta__mitad--abajo">
+              <div class="carta__cara carta__cara--frente">
+                <p class="caps reservado__k" id="portada-k">Reservado para</p>
+                <p class="script carta__invitado" id="portada-invitado">un invitado muy especial</p>
+                <p class="caps carta__nota">Tenemos el honor de invitarte</p>
+              </div>
+              <div class="carta__cara carta__cara--dorso" aria-hidden="true"></div>
+            </div>
+            <span class="carta__brillo" aria-hidden="true"></span>
           </div>
-          <div class="carta__cara carta__cara--dorso" aria-hidden="true"></div>
-        </div>
-        <span class="carta__brillo" aria-hidden="true"></span>
-      </div>
 
-      <div class="sobre3d__bolsillo sobre3d__pieza" aria-hidden="true">
-        <p class="caps sobre3d__para">Para</p>
-        <p class="script sobre3d__nombre" id="sobre-nombre">un invitado especial</p>
+          <div class="sobre3d__bolsillo sobre3d__pieza" aria-hidden="true">
+            <p class="caps sobre3d__para">Para</p>
+            <p class="script sobre3d__nombre" id="sobre-nombre">un invitado especial</p>
+          </div>
+          <div class="sobre3d__solapa sobre3d__pieza" aria-hidden="true">
+            <span class="sobre3d__cara sobre3d__cara--fuera"></span>
+            <span class="sobre3d__cara sobre3d__cara--dentro"></span>
+          </div>
+          <div class="sobre3d__liston sobre3d__pieza" aria-hidden="true">
+            <svg class="sobre3d__lazo" viewBox="0 0 28 22"><use href="#lazo"></use></svg>
+          </div>
+          <button type="button" class="sobre3d__sello sobre3d__pieza" id="abrir" aria-label="Abrir la invitación">
+            <span class="lacre lacre--mitad lacre--izq" aria-hidden="true"><img class="lacre__img" src="sello.webp?v=20260903j" alt="" decoding="async"><span class="lacre__mono didone">I&amp;M</span></span>
+            <span class="lacre lacre--mitad lacre--der" aria-hidden="true"><img class="lacre__img" src="sello.webp?v=20260903j" alt="" decoding="async"><span class="lacre__mono didone">I&amp;M</span></span>
+            <span class="sobre__halo" aria-hidden="true"></span>
+          </button>
+        </div>
       </div>
-      <div class="sobre3d__solapa sobre3d__pieza" aria-hidden="true">
-        <span class="sobre3d__cara sobre3d__cara--fuera"></span>
-        <span class="sobre3d__cara sobre3d__cara--dentro"></span>
-      </div>
-      <div class="sobre3d__liston sobre3d__pieza" aria-hidden="true">
-        <svg class="sobre3d__lazo" viewBox="0 0 28 22"><use href="#lazo"></use></svg>
-      </div>
-      <button type="button" class="sobre3d__sello sobre3d__pieza" id="abrir" aria-label="Abrir la invitación">
-        <span class="lacre lacre--mitad lacre--izq" aria-hidden="true"><img class="lacre__img" src="sello.webp?v=20260903i" alt="" decoding="async"><span class="lacre__mono didone">I&amp;M</span></span>
-        <span class="lacre lacre--mitad lacre--der" aria-hidden="true"><img class="lacre__img" src="sello.webp?v=20260903i" alt="" decoding="async"><span class="lacre__mono didone">I&amp;M</span></span>
-        <span class="sobre__halo" aria-hidden="true"></span>
-      </button>
     </div>
   </div>
   <p class="caps sobre__pista" id="sobre-pista">Toca el sello para abrir</p>
@@ -157,7 +165,7 @@
         <div class="arco__filete" aria-hidden="true"></div>
         <div class="arco" id="arco" aria-hidden="true"></div>
         <div class="liston script" id="liston" aria-hidden="true">reservado</div>
-        <span class="lacre sello--hero" aria-hidden="true"><img class="lacre__img" src="sello.webp?v=20260903i" alt="" decoding="async"><span class="lacre__mono didone">I&amp;M</span></span>
+        <span class="lacre sello--hero" aria-hidden="true"><img class="lacre__img" src="sello.webp?v=20260903j" alt="" decoding="async"><span class="lacre__mono didone">I&amp;M</span></span>
       </div>
 
       <h1 class="didone hero__nombres">Inés <span class="hero__amp">&amp;</span> Marcel</h1>
@@ -174,12 +182,12 @@
     <!-- El trailer: pantalla completa al abrir, se recoge hasta el arco al deslizar -->
     <div class="pantalla" id="pantalla">
       <video class="pantalla__ambiente" id="ambiente" muted loop playsinline preload="none" aria-hidden="true">
-        <source src="savethedate.m4v?v=20260903i" type="video/mp4">
-        <source src="savethedate.mp4?v=20260903i" type="video/mp4">
+        <source src="savethedate.m4v?v=20260903j" type="video/mp4">
+        <source src="savethedate.mp4?v=20260903j" type="video/mp4">
       </video>
-      <video id="trailer" class="pantalla__video" playsinline webkit-playsinline muted autoplay loop preload="auto" poster="savethedate-poster.jpg?v=20260903i">
-        <source src="savethedate.m4v?v=20260903i" type="video/mp4">
-        <source src="savethedate.mp4?v=20260903i" type="video/mp4">
+      <video id="trailer" class="pantalla__video" playsinline webkit-playsinline muted autoplay loop preload="auto" poster="savethedate-poster.jpg?v=20260903j">
+        <source src="savethedate.m4v?v=20260903j" type="video/mp4">
+        <source src="savethedate.mp4?v=20260903j" type="video/mp4">
       </video>
       <div class="pantalla__velo" aria-hidden="true"></div>
       <p class="caps pantalla__marca">Save the date · 00:46</p>
@@ -237,8 +245,8 @@
 
       <div class="minifilm r" id="minifilm" style="--i: 2" role="img" aria-label="Vino Mundo: el salón del acto civil y el de la cena">
         <div class="minifilm__barra minifilm__barra--arriba"></div>
-        <img class="minifilm__escena minifilm__escena--1" src="venue-civil.jpg?v=20260903i" alt="" loading="lazy" decoding="async">
-        <img class="minifilm__escena minifilm__escena--2" src="venue-cena.jpg?v=20260903i" alt="" loading="lazy" decoding="async">
+        <img class="minifilm__escena minifilm__escena--1" src="venue-civil.jpg?v=20260903j" alt="" loading="lazy" decoding="async">
+        <img class="minifilm__escena minifilm__escena--2" src="venue-cena.jpg?v=20260903j" alt="" loading="lazy" decoding="async">
         <div class="minifilm__vineta"></div>
         <div class="minifilm__grano"></div>
         <div class="minifilm__rotulo minifilm__rotulo--1"><span class="didone">El sí</span><span class="caps">Acto civil · 5:00 PM</span></div>
@@ -263,11 +271,11 @@
       <div class="carrete r" id="carrete" style="--i: 1">
         <div class="carrete__perf" aria-hidden="true"></div>
         <div class="carrete__pista" id="pista">
-          <figure class="fotograma" data-tc="33"><img src="fotograma-d.jpg?v=20260903i" alt="Inés y Marcel" loading="lazy" decoding="async"><figcaption class="caps">01 · TC 00:33</figcaption></figure>
-          <figure class="fotograma" data-tc="24"><img src="fotograma-b.jpg?v=20260903i" alt="Inés" loading="lazy" decoding="async"><figcaption class="caps">02 · TC 00:24</figcaption></figure>
-          <figure class="fotograma" data-tc="14"><img src="fotograma-e.jpg?v=20260903i" alt="" loading="lazy" decoding="async"><figcaption class="caps">03 · TC 00:14</figcaption></figure>
-          <figure class="fotograma" data-tc="7"><img src="fotograma-a.jpg?v=20260903i" alt="" loading="lazy" decoding="async"><figcaption class="caps">04 · TC 00:07</figcaption></figure>
-          <figure class="fotograma fotograma--foto"><img src="fotograma-novios.jpg?v=20260903i" alt="Inés y Marcel" loading="lazy" decoding="async"><figcaption class="caps">05 · Fotografía</figcaption></figure>
+          <figure class="fotograma" data-tc="33"><img src="fotograma-d.jpg?v=20260903j" alt="Inés y Marcel" loading="lazy" decoding="async"><figcaption class="caps">01 · TC 00:33</figcaption></figure>
+          <figure class="fotograma" data-tc="24"><img src="fotograma-b.jpg?v=20260903j" alt="Inés" loading="lazy" decoding="async"><figcaption class="caps">02 · TC 00:24</figcaption></figure>
+          <figure class="fotograma" data-tc="14"><img src="fotograma-e.jpg?v=20260903j" alt="" loading="lazy" decoding="async"><figcaption class="caps">03 · TC 00:14</figcaption></figure>
+          <figure class="fotograma" data-tc="7"><img src="fotograma-a.jpg?v=20260903j" alt="" loading="lazy" decoding="async"><figcaption class="caps">04 · TC 00:07</figcaption></figure>
+          <figure class="fotograma fotograma--foto"><img src="fotograma-novios.jpg?v=20260903j" alt="Inés y Marcel" loading="lazy" decoding="async"><figcaption class="caps">05 · Fotografía</figcaption></figure>
         </div>
         <div class="carrete__perf" aria-hidden="true"></div>
       </div>
@@ -517,7 +525,7 @@
       <p class="rsvp__deadline caps" id="rsvp-deadline-note" hidden>Las confirmaciones se cerraron el 15 de septiembre de 2026.</p>
 
       <div class="rsvp__thanks" id="rsvp-thanks" hidden>
-        <span class="lacre sello--gracias" aria-hidden="true"><img class="lacre__img" src="sello.webp?v=20260903i" alt="" decoding="async"><span class="lacre__mono didone">I&amp;M</span></span>
+        <span class="lacre sello--gracias" aria-hidden="true"><img class="lacre__img" src="sello.webp?v=20260903j" alt="" decoding="async"><span class="lacre__mono didone">I&amp;M</span></span>
         <p class="rsvp__summary" id="rsvp-summary"></p>
         <button type="button" class="boton caps" id="rsvp-edit-btn">Editar respuesta</button>
       </div>
@@ -527,17 +535,17 @@
     <footer class="firma reveal">
       <div class="firma__linea r" style="--i: 0">
         <span class="script firma__texto" id="firma">con amor,</span>
-        <span class="lacre sello--firma" aria-hidden="true"><img class="lacre__img" src="sello.webp?v=20260903i" alt="" decoding="async"><span class="lacre__mono didone">I&amp;M</span></span>
+        <span class="lacre sello--firma" aria-hidden="true"><img class="lacre__img" src="sello.webp?v=20260903j" alt="" decoding="async"><span class="lacre__mono didone">I&amp;M</span></span>
       </div>
       <p class="caps firma__pie r" style="--i: 1">Vino Mundo · 27 · 11 · 2026</p>
     </footer>
   </main>
 </div>
 
-<audio id="cancion" src="cancion.mp3?v=20260903i" preload="none" loop></audio>
+<audio id="cancion" src="cancion.mp3?v=20260903j" preload="none" loop></audio>
 
-<script src="rsvp-api.js?v=20260903i"></script>
-<script src="rsvp.js?v=20260903i"></script>
-<script src="velada.js?v=20260903i"></script>
+<script src="rsvp-api.js?v=20260903j"></script>
+<script src="rsvp.js?v=20260903j"></script>
+<script src="velada.js?v=20260903j"></script>
 </body>
 </html>
