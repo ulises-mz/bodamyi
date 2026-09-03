@@ -103,7 +103,7 @@ html.is-locked, body.is-locked { overflow: hidden; height: 100%; }
 .portada .hojas { position: absolute; inset: 0; }
 .sobre { position: relative; width: 100%; max-width: 360px; display: flex; flex-direction: column; transition: transform 1s var(--suave), opacity 0.7s ease 0.15s; }
 .portada.is-opening .sobre { transform: translateY(-70px) scale(1.04); opacity: 0; }
-.sobre__tarjeta { padding: 34px 24px 98px; gap: 14px; }
+.tarjeta.sobre__tarjeta { padding: 34px 24px 98px; gap: 14px; }
 .sobre__nombres { margin: 0; font-size: clamp(2.2rem, 11vw, 2.7rem); line-height: 1; font-style: italic; text-align: center; }
 .sobre__fecha { margin: 0; font-size: 9px; color: var(--mute); text-align: center; }
 .sobre__invitado { margin: 0; font-size: 36px; line-height: 1.1; text-align: center; color: var(--choco); }
