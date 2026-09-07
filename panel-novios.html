@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel de Novios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Sora:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="panel-novios.css?v=20260907b" />
+</head>
+<body>
+  <div class="dashboard-bg dashboard-bg--a" aria-hidden="true"></div>
+  <div class="dashboard-bg dashboard-bg--b" aria-hidden="true"></div>
+
+  <main class="dashboard-wrap">
+    <header class="dashboard-top">
+      <div>
+        <p class="dashboard-kicker">Administracion privada</p>
+        <h1>Panel de Novios</h1>
+        <p class="dashboard-copy">Lista de invitados agrupada y distribucion automatica de mesas.</p>
+      </div>
+
+      <div class="dashboard-actions">
+        <p id="panel-sync-state" class="panel-sync-state" role="status" aria-live="polite"></p>
+        <button id="panel-refresh-btn" class="btn btn--soft" type="button">Actualizar</button>
+        <button id="panel-logout-btn" class="btn" type="button">Cerrar sesion</button>
+        <a class="btn btn--link" href="index.html" target="_top">Ver invitacion</a>
+      </div>
+    </header>
+
+    <section class="stats-grid" aria-label="Resumen general">
+      <article class="stat-card">
+        <p id="stat-groups">0</p>
+        <span>Grupos</span>
+      </article>
+      <article class="stat-card">
+        <p id="stat-households">0</p>
+        <span>Confirmaciones</span>
+      </article>
+      <article class="stat-card">
+        <p id="stat-people">0</p>
+        <span>Personas</span>
+      </article>
+      <article class="stat-card">
+        <p id="stat-declined">0</p>
+        <span>No asistiran</span>
+      </article>
+      <article class="stat-card">
+        <p id="stat-civil">0</p>
+        <span>Al acto civil</span>
+      </article>
+      <article class="stat-card">
+        <p id="stat-cena">0</p>
+        <span>A la cena</span>
+      </article>
+      <article class="stat-card">
+        <p id="stat-dietary">0</p>
+        <span>Con restricciones</span>
+      </article>
+    </section>
+
+    <section id="news-banner" class="news-banner" role="status" aria-live="polite" hidden>
+      <div class="news-banner__text">
+        <p class="news-banner__title" id="news-title"></p>
+        <p class="news-banner__names" id="news-names"></p>
+      </div>
+      <button type="button" id="news-dismiss" class="btn btn--mini btn--soft">Marcar como visto</button>
+    </section>
+
+    <nav class="panel-tabs" id="panel-tabs" role="tablist" aria-label="Secciones del panel">
+      <button type="button" class="panel-tab" role="tab" data-tab="invitados" id="tab-btn-invitados" aria-controls="tab-invitados" aria-selected="true">
+        <span class="panel-tab__icon" aria-hidden="true">👥</span>
+        <span class="panel-tab__label">Invitados</span>
+        <span class="panel-tab__count" id="tab-count-invitados">0</span>
+      </button>
+      <button type="button" class="panel-tab" role="tab" data-tab="mesas" id="tab-btn-mesas" aria-controls="tab-mesas" aria-selected="false">
+        <span class="panel-tab__icon" aria-hidden="true">🪑</span>
+        <span class="panel-tab__label">Mesas</span>
+        <span class="panel-tab__count" id="tab-count-mesas">0</span>
+      </button>
+      <button type="button" class="panel-tab" role="tab" data-tab="detalles" id="tab-btn-detalles" aria-controls="tab-detalles" aria-selected="false">
+        <span class="panel-tab__icon" aria-hidden="true">💌</span>
+        <span class="panel-tab__label">Canciones y mensajes</span>
+        <span class="panel-tab__count" id="tab-count-detalles">0</span>
+      </button>
+    </nav>
+
+    <section class="tab-panel is-active" id="tab-invitados" role="tabpanel" aria-labelledby="tab-btn-invitados">
+      <article class="panel-card panel-card--guests">
+        <div class="panel-head">
+          <h2>Invitados por grupo</h2>
+          <input id="group-search" type="search" placeholder="Buscar grupo o invitado" autocomplete="off" />
+        </div>
+        <div id="grouped-list" class="grouped-list"></div>
+      </article>
+
+      <article class="panel-card panel-card--declined">
+        <div class="panel-head panel-head--stack">
+          <h2>No asistiran</h2>
+          <p>Confirmaciones marcadas como no asistencia.</p>
+        </div>
+        <div id="declined-list" class="declined-list"></div>
+      </article>
+    </section>
+
+    <section class="tab-panel" id="tab-mesas" role="tabpanel" aria-labelledby="tab-btn-mesas" hidden>
+      <article class="panel-card panel-card--planner">
+        <div class="panel-head panel-head--stack">
+          <h2>Mesas</h2>
+          <p class="panel-note">Aqui solo cuentan quienes confirmaron cena o ambos: quien va solo al acto civil no ocupa silla.</p>
+          <p>Crea las mesas, acomoda a tus invitados y revisa como queda el salon.</p>
+        </div>
+
+        <form id="table-plan-form" class="planner-form" novalidate>
+          <!-- Resumen siempre visible: cuantas mesas, cuantos asientos y
+               cuanta gente falta por sentar. -->
+          <section class="planner-summary" aria-label="Resumen del acomodo">
+            <div class="planner-summary__stat">
+              <p id="summary-tables">0</p>
+              <span>Mesas</span>
+            </div>
+            <div class="planner-summary__stat">
+              <p id="summary-seats">0</p>
+              <span>Asientos</span>
+            </div>
+            <div class="planner-summary__stat">
+              <p id="summary-seated">0</p>
+              <span>Acomodados</span>
+            </div>
+            <div class="planner-summary__stat planner-summary__stat--pending">
+              <p id="summary-pending">0</p>
+              <span>Por acomodar</span>
+            </div>
+          </section>
+
+          <div class="planner-progress" aria-hidden="true">
+            <span id="planner-progress-fill"></span>
+          </div>
+
+          <!-- Barra unica de acciones: crear mesas, acomodar y limpiar. -->
+          <div class="planner-toolbar">
+            <div class="planner-toolbar__group">
+              <button type="button" id="table-add-btn" class="btn btn--secondary">+ Agregar mesa</button>
+              <button type="button" id="assignment-auto-btn" class="btn btn--primary" data-mode="auto">Acomodar a todos</button>
+            </div>
+
+            <div class="planner-toolbar__group planner-toolbar__group--end">
+              <details class="planner-menu">
+                <summary class="btn btn--soft">Mas opciones</summary>
+                <div class="planner-menu__body">
+                  <div class="planner-create">
+                    <label>
+                      <span>Nombre de la mesa</span>
+                      <input type="text" name="tableLabel" maxlength="40" placeholder="Mesa Jardin" />
+                    </label>
+                    <label>
+                      <span>Asientos</span>
+                      <input type="number" name="tableCapacity" min="1" max="30" value="8" required />
+                    </label>
+                  </div>
+                  <p class="planner-menu__note">Estos datos se usan al tocar "Agregar mesa".</p>
+
+                  <hr class="planner-menu__sep" />
+
+                  <div class="planner-create">
+                    <label>
+                      <span>Cuantas mesas</span>
+                      <input type="number" name="tableCount" min="1" max="60" value="12" />
+                    </label>
+                    <label>
+                      <span>Asientos c/u</span>
+                      <input type="number" name="seatsPerTable" min="1" max="30" value="8" />
+                    </label>
+                  </div>
+                  <button type="button" id="table-generate-uniform" class="btn btn--neutral">Crear varias mesas de una vez</button>
+
+                  <hr class="planner-menu__sep" />
+
+                  <button type="button" id="table-plan-reset" class="btn btn--danger-soft">Borrar todas las mesas</button>
+                </div>
+              </details>
+            </div>
+          </div>
+
+          <section class="planner-block planner-block--open" aria-labelledby="planner-step-assign-title">
+            <div class="planner-block__summary planner-block__summary--static">
+              <span class="planner-block__title" id="planner-step-assign-title">Como quieres sentarlos</span>
+            </div>
+
+            <div id="assignment-mode-tabs" class="assignment-mode-tabs" role="tablist" aria-label="Modo de asignacion">
+              <button type="button" class="assignment-mode-tab" data-mode="group">Por familia</button>
+              <button type="button" class="assignment-mode-tab" data-mode="individual">Por persona</button>
+            </div>
+
+            <p id="planner-mode-hint" class="planner-mode-hint"></p>
+
+            <div class="assignment-workspace">
+              <aside class="assignment-pool-shell">
+                <div class="panel-head panel-head--stack planner-subhead">
+                  <h3 id="manual-assignment-title">Invitados por acomodar</h3>
+                  <p id="manual-assignment-copy">Toca una familia o persona para seleccionarla y luego toca la mesa o el asiento donde va. En computadora tambien puedes arrastrarla.</p>
+                </div>
+
+                <div id="assignment-selected-banner" class="assignment-selected-banner" hidden>
+                  <span id="assignment-selected-text"></span>
+                  <button type="button" id="assignment-selected-cancel" class="btn btn--mini btn--soft">Cancelar</button>
+                </div>
+
+                <div id="assignment-unassigned-drop" class="assignment-unassigned-drop" aria-label="Quitar de mesa" role="button" tabindex="0">
+                  Con un elemento seleccionado, toca aqui para quitarlo de su mesa (o arrastralo hasta aca)
+                </div>
+
+                <div id="manual-assignment-list" class="manual-assignment-list"></div>
+              </aside>
+
+              <section class="assignment-map-shell" aria-label="Area de asignacion por mesa">
+                <div class="panel-head panel-head--stack planner-subhead">
+                  <h3>Croquis del salon</h3>
+                  <p>✎ edita la mesa · Mover la reubica · toca un asiento para sentar al invitado seleccionado.</p>
+                </div>
+
+                <div class="map-toolbar" aria-label="Controles del lienzo">
+                  <div class="map-toolbar__group">
+                    <button type="button" id="map-zoom-out" class="btn btn--mini btn--soft">-</button>
+                    <button type="button" id="map-zoom-in" class="btn btn--mini btn--soft">+</button>
+                    <button type="button" id="map-view-reset" class="btn btn--mini btn--neutral">Centrar</button>
+                  </div>
+                  <p id="map-zoom-label" class="map-zoom-label">Zoom 100%</p>
+                </div>
+
+                <div id="table-map" class="table-map" aria-label="Croquis de mesas"></div>
+
+                <div id="table-context-menu" class="table-context-menu" hidden>
+                  <p class="table-context-menu__title">Editar mesa</p>
+
+                  <label class="table-context-menu__field">
+                    <span>Nombre</span>
+                    <input id="table-context-label" type="text" maxlength="40" />
+                  </label>
+
+                  <label class="table-context-menu__field">
+                    <span>Capacidad</span>
+                    <input id="table-context-capacity" type="number" min="1" max="60" />
+                  </label>
+
+                  <label class="table-context-menu__field">
+                    <span>Tamano (%)</span>
+                    <input id="table-context-size" type="number" min="60" max="200" step="5" />
+                  </label>
+
+                  <label class="table-context-menu__field">
+                    <span>Relacion (X:Y)</span>
+                    <select id="table-context-ratio">
+                      <option value="1:1">1:1</option>
+                      <option value="1:2">1:2</option>
+                      <option value="2:1">2:1</option>
+                      <option value="3:2">3:2</option>
+                      <option value="2:3">2:3</option>
+                    </select>
+                  </label>
+
+                  <div class="table-context-menu__actions">
+                    <button type="button" id="table-context-save" class="btn btn--mini btn--primary">Guardar</button>
+                    <button type="button" id="table-context-delete" class="btn btn--mini btn--danger-soft">Eliminar</button>
+                    <button type="button" id="table-context-cancel" class="btn btn--mini btn--soft">Cancelar</button>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </section>
+
+          <p id="table-plan-explainer" class="table-plan-explainer"></p>
+        </form>
+
+        <!-- Detalle mesa por mesa: util para imprimir o repasar, pero
+             plegado para no repetir lo que ya muestra el croquis. -->
+        <p id="table-plan-status" class="table-plan-status" hidden></p>
+
+        <details class="planner-detail">
+          <summary class="planner-detail__summary">Ver lista de mesas e invitados</summary>
+          <div id="table-config-list" class="table-config-list" hidden></div>
+          <div id="table-plan-output" class="table-plan-output"></div>
+        </details>
+      </article>
+    </section>
+
+    <section class="tab-panel" id="tab-detalles" role="tabpanel" aria-labelledby="tab-btn-detalles" hidden>
+      <article class="panel-card panel-card--extras">
+        <div class="panel-head panel-head--stack">
+          <h2>Restricciones, canciones y mensajes</h2>
+          <p>Lo que los invitados escribieron al confirmar: restricciones alimenticias para el restaurante, sugerencias musicales para la fiesta y mensajes para ustedes.</p>
+        </div>
+
+        <div class="extras-grid">
+          <article class="extras-block">
+            <h3 class="extras-block__title">Restricciones alimenticias</h3>
+            <div id="dietary-list" class="extras-list"></div>
+          </article>
+
+          <article class="extras-block">
+            <h3 class="extras-block__title">Canciones sugeridas</h3>
+            <div id="songs-list" class="extras-list"></div>
+          </article>
+
+          <article class="extras-block">
+            <h3 class="extras-block__title">Mensajes para los novios</h3>
+            <div id="messages-list" class="extras-list"></div>
+          </article>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="rsvp-api.js?v=20260907b"></script>
+  <script src="panel-novios.js?v=20260907b"></script>
+</body>
+</html>
