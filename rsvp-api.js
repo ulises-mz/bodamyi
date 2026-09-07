@@ -28,6 +28,8 @@ const RSVP_API = (() => {
       attendeeNames: Array.isArray(row.attendee_names) ? row.attendee_names : [],
       song: row.song || '',
       message: row.message || '',
+      events: row.events || '',
+      dietary: row.dietary || '',
       createdAt: row.created_at || '',
       updatedAt: row.updated_at || '',
     };
@@ -44,6 +46,8 @@ const RSVP_API = (() => {
       attendee_names: record.attendeeNames,
       song: record.song || '',
       message: record.message || '',
+      events: record.events || '',
+      dietary: record.dietary || '',
     };
   }
 

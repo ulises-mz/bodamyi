@@ -498,13 +498,13 @@
   if (sinpeButton) {
     sinpeButton.addEventListener('click', async () => {
       try {
-        await navigator.clipboard.writeText('60720983');
+        await navigator.clipboard.writeText('71833250');
         if (sinpeOk) {
           sinpeOk.hidden = false;
           setTimeout(() => { sinpeOk.hidden = true; }, 1600);
         }
       } catch (error) {
-        window.prompt('Sinpe Móvil de Marcel', '6072-0983');
+        window.prompt('Sinpe Móvil de Ana Lucía Salas', '7183-3250');
       }
     });
   }

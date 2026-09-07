@@ -633,6 +633,23 @@ body.is-open .pantalla__video { transform: none; }
 .rsvp-choice__card.is-checked .rsvp-choice__mark { background: var(--choco); color: var(--lino); }
 .rsvp-choice__title { font-size: 19px; line-height: 1.1; }
 .rsvp-choice__sub { font-size: 8px; color: var(--mute); }
+.rsvp-lista { display: flex; flex-direction: column; gap: 8px; }
+.rsvp-opcion {
+  position: relative;
+  display: flex; align-items: center; gap: 14px;
+  padding: 13px 16px; min-height: 56px;
+  border: 1px solid var(--hair);
+  cursor: pointer;
+  transition: border-color 0.25s ease, background-color 0.25s ease, transform 0.25s var(--suave);
+}
+.rsvp-opcion input { position: absolute; opacity: 0; pointer-events: none; }
+.rsvp-opcion.is-checked { border-color: var(--choco); background: rgba(74,58,43,0.05); }
+.rsvp-opcion__mark { width: 28px; height: 28px; flex-shrink: 0; border-radius: 999px; border: 1px solid var(--choco); display: flex; align-items: center; justify-content: center; color: transparent; transition: background-color 0.25s ease, color 0.25s ease; }
+.rsvp-opcion__mark svg { width: 14px; height: 14px; }
+.rsvp-opcion.is-checked .rsvp-opcion__mark { background: var(--choco); color: var(--lino); }
+.rsvp-opcion__texto { display: flex; flex-direction: column; gap: 3px; }
+.rsvp-opcion__titulo { font-size: 19px; line-height: 1.1; }
+.rsvp-opcion__sub { font-size: 8px; color: var(--mute); }
 .rsvp-field { display: flex; flex-direction: column; gap: 8px; }
 .rsvp-field__label { font-size: 9px; color: var(--mute); }
 .rsvp__input {

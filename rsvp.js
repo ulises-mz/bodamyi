@@ -18,6 +18,12 @@
   const rsvpStatus = document.getElementById('rsvp-status');
   const rsvpDeadlineNote = document.getElementById('rsvp-deadline-note');
   const attendInputs = Array.from(document.querySelectorAll('input[name="attend"]'));
+  const eventInputs = Array.from(document.querySelectorAll('input[name="events"]'));
+  const dietaryChoiceInputs = Array.from(document.querySelectorAll('input[name="dietaryChoice"]'));
+  const dietaryWrap = document.getElementById('dietary-wrap');
+  const dietaryInput = rsvpForm.querySelector('textarea[name="dietary"]');
+  const seleccion = (name) => document.querySelector('input[name="' + name + '"]:checked');
+  const EVENTOS = { civil: 'Acto civil', cena: 'Cena', ambas: 'Acto civil y cena' };
   const rsvpSubmitButton = rsvpForm.querySelector('button[type="submit"]');
   const fullNameInput = rsvpForm.querySelector('input[name="fullName"]');
   const emailInput = rsvpForm.querySelector('input[name="email"]');
@@ -58,6 +64,9 @@
       peopleCount = 0;
       attendeeNames = [];
     }
+    const eventsRaw = (record?.events || '').toString().trim();
+    const events = attend === 'yes' ? (EVENTOS[eventsRaw] ? eventsRaw : '') : '';
+    const dietary = events && events !== 'civil' ? (record?.dietary || '').toString().trim() : '';
     const groupName = (record?.groupName || '').toString().trim() || fullName || 'Sin grupo definido';
     return {
       id: (record?.id || '').toString().trim() || `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -73,6 +82,8 @@
       attendeeNames,
       song: (record?.song || '').toString().trim(),
       message: (record?.message || '').toString().trim(),
+      events,
+      dietary,
     };
   }
 
@@ -172,10 +183,12 @@
   function syncAttendanceFields() {
     const selected = document.querySelector('input[name="attend"]:checked');
     const showDetails = selected && selected.value === 'yes';
-    document.querySelectorAll('.rsvp-choice__card').forEach((card) => {
+    document.querySelectorAll('.rsvp-choice__card, .rsvp-opcion').forEach((card) => {
       const input = card.querySelector('input');
       card.classList.toggle('is-checked', Boolean(input && input.checked));
     });
+    const tieneRestricciones = seleccion('dietaryChoice');
+    if (dietaryWrap) dietaryWrap.hidden = !(tieneRestricciones && tieneRestricciones.value === 'yes');
     if (attendanceDetailsWrap) attendanceDetailsWrap.hidden = !showDetails;
     if (peopleCountInput) {
       peopleCountInput.required = Boolean(showDetails);
@@ -212,8 +225,13 @@
   let wizardStepId = 0;
 
   function wizardOrder() {
-    const selected = document.querySelector('input[name="attend"]:checked');
-    return selected && selected.value === 'no' ? [0, 1, 3] : [0, 1, 2, 3];
+    const attend = seleccion('attend');
+    if (attend && attend.value === 'no') return [0, 3, 5];
+    const events = seleccion('events');
+    const order = [0, 1];
+    if (!events || events.value !== 'civil') order.push(2);
+    order.push(3, 4, 5);
+    return order;
   }
 
   function goToWizardStep(stepId) {
@@ -229,8 +247,9 @@
       dot.classList.toggle('is-current', dotId === stepId);
       dot.classList.toggle('is-done', dotPos > -1 && dotPos < pos);
     });
-    const skippedBar = document.querySelector('.rsvp-progress__bar[data-bar="2"]');
-    if (skippedBar) skippedBar.style.display = order.includes(2) ? '' : 'none';
+    document.querySelectorAll('.rsvp-progress__bar[data-bar]').forEach((bar) => {
+      bar.style.display = order.includes(Number(bar.dataset.bar)) ? '' : 'none';
+    });
     if (wizardHint) wizardHint.textContent = `Paso ${pos + 1} de ${order.length}`;
     const isFirst = pos === 0;
     const isLast = pos === order.length - 1;
@@ -245,11 +264,20 @@
       return document.querySelector('input[name="attend"]:checked') ? '' : 'Selecciona si asistirás o no.';
     }
     if (stepId === 1) {
+      return seleccion('events') ? '' : 'Elige a qué asistirás.';
+    }
+    if (stepId === 2) {
+      const eleccion = seleccion('dietaryChoice');
+      if (!eleccion) return 'Cuéntanos si tienes alguna restricción alimenticia.';
+      if (eleccion.value === 'yes' && (!dietaryInput || !dietaryInput.value.trim())) return 'Escribe cuáles son tus restricciones.';
+      return '';
+    }
+    if (stepId === 3) {
       if (!fullNameInput || fullNameInput.value.trim().length < 5) return 'Escribe tu nombre completo.';
       if (!emailInput || !isValidEmail(emailInput.value.trim())) return 'Escribe un correo electrónico válido.';
       return '';
     }
-    if (stepId === 2) {
+    if (stepId === 4) {
       const names = getAttendeeInputValues().map((value) => value.trim());
       if (!names.length || names.some((name) => !name)) return 'Escribe el nombre de cada persona que asistirá.';
       return '';
@@ -275,9 +303,27 @@
     });
   }
 
+  function avanzarDesde(stepId) {
+    const order = wizardOrder();
+    const pos = order.indexOf(stepId);
+    if (pos > -1 && pos < order.length - 1) goToWizardStep(order[pos + 1]);
+  }
   attendInputs.forEach((input) => {
     input.addEventListener('change', () => {
-      if (wizardStepId === 0) setTimeout(() => goToWizardStep(1), 280);
+      if (wizardStepId === 0) setTimeout(() => avanzarDesde(0), 280);
+    });
+  });
+  eventInputs.forEach((input) => {
+    input.addEventListener('change', () => {
+      syncAttendanceFields();
+      if (wizardStepId === 1) setTimeout(() => avanzarDesde(1), 280);
+    });
+  });
+  dietaryChoiceInputs.forEach((input) => {
+    input.addEventListener('change', () => {
+      syncAttendanceFields();
+      if (wizardStepId === 2 && input.value === 'no') setTimeout(() => avanzarDesde(2), 280);
+      if (input.value === 'yes' && dietaryInput) setTimeout(() => dietaryInput.focus(), 60);
     });
   });
 
@@ -288,6 +334,12 @@
     const email = (formData.get('email') || '').toString().trim().toLowerCase();
     const groupName = fullName;
     const attend = (formData.get('attend') || '').toString();
+    const eventsRaw = (formData.get('events') || '').toString();
+    const events = attend === 'yes' && EVENTOS[eventsRaw] ? eventsRaw : '';
+    const dietaryChoice = (formData.get('dietaryChoice') || '').toString();
+    const dietary = events && events !== 'civil' && dietaryChoice === 'yes'
+      ? (formData.get('dietary') || '').toString().trim()
+      : '';
     const rawPeopleCount = Number(formData.get('peopleCount') || 0);
     const peopleCount = Number.isFinite(rawPeopleCount) ? Math.round(rawPeopleCount) : 0;
     const attendeeNames = formData.getAll('attendeeName').map((value) => value.toString().trim()).filter(Boolean);
@@ -302,6 +354,8 @@
       attendeeNames: attend === 'yes' ? attendeeNames : [],
       song: (formData.get('song') || '').toString().trim(),
       message: (formData.get('message') || '').toString().trim(),
+      events,
+      dietary,
     };
   }
 
@@ -310,6 +364,7 @@
     if (!isValidEmail(payload.email)) return 'Escribe un correo electrónico válido para guardar tu confirmación.';
     if (payload.attend !== 'yes' && payload.attend !== 'no') return 'Selecciona si asistirás o no.';
     if (payload.attend === 'yes') {
+      if (!payload.events) return 'Elige a qué asistirás: acto civil, cena o ambos.';
       if (payload.peopleCount < 1) return 'Indica el número total de personas que asistirán.';
       if (!payload.attendeeNames.length) return 'Escribe el nombre de cada persona que asistirá.';
       if (payload.attendeeNames.length !== payload.peopleCount) {
@@ -326,6 +381,8 @@
     const lines = [saveMessage, `Nombre: ${record.fullName}`, `Correo: ${record.email}`];
     if (record.attend === 'yes') {
       lines.push('Asistencia confirmada');
+      if (record.events) lines.push(`Asistirá a: ${EVENTOS[record.events] || record.events}`);
+      if (record.dietary) lines.push(`Restricciones alimenticias: ${record.dietary}`);
       lines.push(`Personas: ${record.peopleCount}`);
       lines.push(`Nombres: ${record.attendeeNames.join(', ')}`);
     } else {
@@ -349,6 +406,8 @@
       attendeeNames: record?.attendeeNames || fallbackPayload.attendeeNames,
       song: record?.song || fallbackPayload.song,
       message: record?.message || fallbackPayload.message,
+      events: record?.events || fallbackPayload.events,
+      dietary: record?.dietary || fallbackPayload.dietary,
     });
   }
 
@@ -356,6 +415,9 @@
     if (fullNameInput) fullNameInput.value = record.fullName || '';
     if (emailInput) emailInput.value = record.email || '';
     attendInputs.forEach((input) => { input.checked = input.value === record.attend; });
+    eventInputs.forEach((input) => { input.checked = input.value === (record.events || ''); });
+    dietaryChoiceInputs.forEach((input) => { input.checked = record.attend === 'yes' && record.events && record.events !== 'civil' && (input.value === (record.dietary ? 'yes' : 'no')); });
+    if (dietaryInput) dietaryInput.value = record.dietary || '';
     const recordNames = record.attendeeNames || [];
     const recordCount = Math.max(1, record.peopleCount || recordNames.length || 1);
     if (peopleCountInput) peopleCountInput.value = String(recordCount);
@@ -400,7 +462,7 @@
     if (!lookupResult.found) { setRsvpStatus(''); setRsvpSubmitMode('create'); return; }
 
     existingRsvpRecord = normalizeServerRecord(lookupResult.record || {}, {
-      fullName, email: '', attend: 'yes', peopleCount: 1, attendeeNames: [], song: '', message: '', recordId: '',
+      fullName, email: '', attend: 'yes', peopleCount: 1, attendeeNames: [], song: '', message: '', events: '', dietary: '', recordId: '',
     });
     latestSavedRecord = existingRsvpRecord;
     setRsvpSubmitMode('edit');
