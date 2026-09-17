@@ -6,7 +6,7 @@
 (() => {
   'use strict';
 
-  const RSVP_DEADLINE = new Date('2026-09-15T23:59:59-06:00');
+  const RSVP_DEADLINE = new Date('2026-09-18T23:59:59-06:00');
 
   const rsvpForm = document.getElementById('rsvp-form');
   if (!rsvpForm || typeof RSVP_API === 'undefined') return;
@@ -204,7 +204,7 @@
     if (rsvpDeadlineNote) rsvpDeadlineNote.hidden = !deadlinePassed;
     if (!deadlinePassed) return false;
     setFormDisabled(true);
-    setRsvpStatus('El plazo para confirmar asistencia cerró el 15 de septiembre de 2026.', 'error');
+    setRsvpStatus('El plazo para confirmar asistencia cerró el 18 de septiembre de 2026.', 'error');
     if (rsvpSubmitButton) {
       rsvpSubmitButton.disabled = true;
       rsvpSubmitButton.textContent = 'Confirmación cerrada';
